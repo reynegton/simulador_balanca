@@ -49,7 +49,8 @@ class HomeStateController extends ValueNotifier<HomeState> {
         },
       );
     } catch (e) {
-      value = HomeStateDisconect(messageError: e.toString());
+      value = HomeStateDisconect(
+          messageError: e.toString(), protocolos: _protocolos);
     }
   }
 
@@ -70,7 +71,6 @@ class HomeStateController extends ValueNotifier<HomeState> {
           print(message);
         }
       },
-
       // handle errors
       onError: (error) {
         if (kDebugMode) {
@@ -78,7 +78,6 @@ class HomeStateController extends ValueNotifier<HomeState> {
         }
         client.close();
       },
-
       // handle the client closing the connection
       onDone: () async {
         if (kDebugMode) {
