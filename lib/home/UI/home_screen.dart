@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:simulador_balanca/home/States/home_state.dart';
+import 'package:simulador_balanca/widgets/show_dialog_custom.dart';
 
-import '../Utils/currency_imput_formatter.dart';
-import '../controllers/home_controller.dart';
-import '../widgets/textformfiled.dart';
+import '../../Utils/currency_imput_formatter.dart';
+import '../Controllers/home_controller.dart';
+import '../../widgets/textformfiled.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -18,7 +20,35 @@ class _HomeState extends State<Home> {
   late TextEditingController _textControllerPesoFim;
   late TextEditingController _textControllerTara;
 
-  final SockerServer socket = SockerServer();
+  late HomeStateController homeState;
+
+  void initController(){
+    homeState = HomeStateController();
+    _textControllerTara.addListener(
+      () {
+        homeState.taraTela = _textControllerTara.text;
+      },
+    );
+    _textControllerPesoIni.addListener(
+      () {
+        homeState.pesoInicialTela = _textControllerPesoIni.text;
+      },
+    );
+    _textControllerPesoFim.addListener(
+      () {
+        homeState.pesoFinalTela = _textControllerPesoFim.text;
+      },
+    );
+  }
+
+  Widget _returnListProtocolos(List<String> listaProtocolos){
+    return ListView.builder(
+                      itemCount: listaProtocolos.length,
+                      itemBuilder: (context, index) {
+                        return Card(child: Text(listaProtocolos[index]));
+                      },
+                    );
+  }
 
   @override
   void initState() {
@@ -27,22 +57,7 @@ class _HomeState extends State<Home> {
     _textControllerPesoIni = TextEditingController(text: '0.0');
     _textControllerPesoFim = TextEditingController(text: '0.0');
     _textControllerTara = TextEditingController(text: '0.0');
-
-    _textControllerTara.addListener(
-      () {
-        socket.taraTela = _textControllerTara.text;
-      },
-    );
-    _textControllerPesoIni.addListener(
-      () {
-        socket.pesoInicialTela = _textControllerPesoIni.text;
-      },
-    );
-    _textControllerPesoFim.addListener(
-      () {
-        socket.pesoFinalTela = _textControllerPesoFim.text;
-      },
-    );
+    initController();
   }
 
   @override
@@ -63,11 +78,11 @@ class _HomeState extends State<Home> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            ValueListenableBuilder(
-              valueListenable: socket.conectado,
-              builder: (context, value, child) {
+            ValueListenableBuilder<HomeState>(
+              valueListenable: homeState,
+              builder: (context, state, child) {
                 return TextFormFieldWidget(
-                  enabled: !value,
+                  enabled: (state is! HomeStateSucess),
                   controller: _textControllerPorta,
                   title: 'Porta',
                 );
@@ -79,9 +94,7 @@ class _HomeState extends State<Home> {
                   child: TextFormFieldWidget(
                     controller: _textControllerPesoIni,
                     title: 'Peso Inicial',
-                    textInputFormatter: [
-                      CurrencyInputFormatter(1)
-                    ],
+                    textInputFormatter: [CurrencyInputFormatter(1)],
                   ),
                 ),
                 const SizedBox(
@@ -91,9 +104,7 @@ class _HomeState extends State<Home> {
                   child: TextFormFieldWidget(
                     controller: _textControllerPesoFim,
                     title: 'Peso Final',
-                    textInputFormatter: [
-                      CurrencyInputFormatter(1)
-                    ],
+                    textInputFormatter: [CurrencyInputFormatter(1)],
                   ),
                 ),
                 const SizedBox(
@@ -112,15 +123,24 @@ class _HomeState extends State<Home> {
               ],
             ),
             Expanded(
-              child: ValueListenableBuilder(
-                valueListenable: socket.protocolos,
-                builder: (context, value, child) {
-                  return ListView.builder(
-                    itemCount: value.length,
-                    itemBuilder: (context, index) {
-                      return Card(child: Text(value[index]));
-                    },
-                  );
+              child: ValueListenableBuilder<HomeState>(
+                valueListenable: homeState,
+                builder: (context, state, child) {
+                  if (state is HomeStateLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } 
+                  if (state is HomeStateSucess) {
+                    return _returnListProtocolos(state.protocolos);
+                  }              
+                  if (state is HomeStateDisconect) {
+                    if ((state.messageError??"") != ""){
+                      showDialogCustom(context: context, msg: state.messageError!);
+                    }        
+                    return _returnListProtocolos(state.protocolos??[]);
+                  }
+                  return const SizedBox.shrink();
                 },
               ),
             )
@@ -129,18 +149,18 @@ class _HomeState extends State<Home> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ValueListenableBuilder<bool>(
-          valueListenable: socket.conectado,
-          builder: (context, value, child) {
+        child: ValueListenableBuilder<HomeState>(
+          valueListenable: homeState,
+          builder: (context, state, child) {
             return Row(
               children: [
                 Expanded(
                   flex: 1,
                   child: ElevatedButton(
-                    onPressed: value
+                    onPressed: (state is HomeStateSucess)
                         ? null
                         : () {
-                            socket.createSocketServer(
+                            homeState.createServer(
                                 int.tryParse(_textControllerPorta.text) ?? 0);
                           },
                     child: const Text('Conectar'),
@@ -152,7 +172,9 @@ class _HomeState extends State<Home> {
                 Expanded(
                   flex: 1,
                   child: ElevatedButton(
-                    onPressed: value ? socket.disconectSocket : null,
+                    onPressed: (state is HomeStateSucess)
+                        ? homeState.disconectSocket
+                        : null,
                     child: const Text('Desconectar'),
                   ),
                 )

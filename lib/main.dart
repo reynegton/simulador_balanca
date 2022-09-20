@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:simulador_balanca/UI/home.dart';
+import 'package:simulador_balanca/home/UI/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
