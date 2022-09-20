@@ -22,7 +22,7 @@ class _HomeState extends State<Home> {
 
   late HomeStateController homeState;
 
-  void initController(){
+  void initController() {
     homeState = HomeStateController();
     _textControllerTara.addListener(
       () {
@@ -41,13 +41,13 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _returnListProtocolos(List<String> listaProtocolos){
+  Widget _returnListProtocolos(List<String> listaProtocolos) {
     return ListView.builder(
-                      itemCount: listaProtocolos.length,
-                      itemBuilder: (context, index) {
-                        return Card(child: Text(listaProtocolos[index]));
-                      },
-                    );
+      itemCount: listaProtocolos.length,
+      itemBuilder: (context, index) {
+        return Card(child: Text(listaProtocolos[index]));
+      },
+    );
   }
 
   @override
@@ -130,15 +130,16 @@ class _HomeState extends State<Home> {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
-                  } 
+                  }
                   if (state is HomeStateSucess) {
                     return _returnListProtocolos(state.protocolos);
-                  }              
+                  }
                   if (state is HomeStateDisconect) {
-                    if ((state.messageError??"") != ""){
-                      showDialogCustom(context: context, msg: state.messageError!);
-                    }        
-                    return _returnListProtocolos(state.protocolos??[]);
+                    if ((state.messageError ?? "") != "") {
+                      showDialogCustom(
+                          context: context, msg: state.messageError!);
+                    }
+                    return _returnListProtocolos(state.protocolos ?? []);
                   }
                   return const SizedBox.shrink();
                 },
