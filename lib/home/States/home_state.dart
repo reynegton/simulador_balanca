@@ -1,7 +1,7 @@
 abstract class HomeState {}
 
 class HomeStateDisconect extends HomeState {
-  HomeStateDisconect({this.messageError,this.protocolos});
+  HomeStateDisconect({this.messageError, this.protocolos});
   String? messageError;
   List<String>? protocolos;
 }

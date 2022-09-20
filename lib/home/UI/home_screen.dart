@@ -42,17 +42,21 @@ class _HomeState extends State<Home> {
   }
 
   Widget _returnListProtocolos(List<String> listaProtocolos) {
-final ScrollController firstController = ScrollController();
+    final ScrollController firstController = ScrollController();
     return Scrollbar(
       thumbVisibility: true,
-                controller: firstController,
+      controller: firstController,
       radius: const Radius.circular(5),
       child: ListView.builder(
         controller: firstController,
-      itemCount: listaProtocolos.length,
-      itemBuilder: (context, index) {
-        return Card(child: Text(listaProtocolos[index]));
-      },
+        itemCount: listaProtocolos.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: Text(
+              listaProtocolos[index],
+            ),
+          );
+        },
       ),
     );
   }
