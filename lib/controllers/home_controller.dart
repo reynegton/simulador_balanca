@@ -24,12 +24,12 @@ class SockerServer{
     var pesofim = double.tryParse(pesoFinalTela) ?? 0;
     var peso = Random().nextDouble() * (pesofim - pesoini).abs() + pesoini;
     var pesoStr =
-        peso.toStringAsFixed(1).replaceAll(',', '').replaceAll('.', '');
+        peso.abs().toStringAsFixed(1).replaceAll(',', '').replaceAll('.', '');
     var tara = double.tryParse(taraTela) ?? 0;
     var taraStr =
-        tara.toStringAsFixed(1).replaceAll(',', '').replaceAll('.', '');
+        tara.abs().toStringAsFixed(1).replaceAll(',', '').replaceAll('.', '');
     var protocolo =
-        "${String.fromCharCode(2)}+p`${pesoStr.padLeft(6, '0')}${taraStr.padLeft(6, '0')}${String.fromCharCode(13)}";
+        "${String.fromCharCode(2)}+${peso>=0?'p':'s'}`${pesoStr.padLeft(6, '0')}${taraStr.padLeft(6, '0')}${String.fromCharCode(13)}";
     return protocolo;
   }
 

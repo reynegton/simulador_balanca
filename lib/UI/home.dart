@@ -24,9 +24,9 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _textControllerPorta = TextEditingController(text: '32211');
-    _textControllerPesoIni = TextEditingController(text: '0');
-    _textControllerPesoFim = TextEditingController(text: '0');
-    _textControllerTara = TextEditingController(text: '0');
+    _textControllerPesoIni = TextEditingController(text: '0.0');
+    _textControllerPesoFim = TextEditingController(text: '0.0');
+    _textControllerTara = TextEditingController(text: '0.0');
 
     _textControllerTara.addListener(
       () {
@@ -80,7 +80,6 @@ class _HomeState extends State<Home> {
                     controller: _textControllerPesoIni,
                     title: 'Peso Inicial',
                     textInputFormatter: [
-                      FilteringTextInputFormatter.allow(RegExp(r'\d')),
                       CurrencyInputFormatter(1)
                     ],
                   ),
@@ -93,7 +92,6 @@ class _HomeState extends State<Home> {
                     controller: _textControllerPesoFim,
                     title: 'Peso Final',
                     textInputFormatter: [
-                      FilteringTextInputFormatter.digitsOnly,
                       CurrencyInputFormatter(1)
                     ],
                   ),
