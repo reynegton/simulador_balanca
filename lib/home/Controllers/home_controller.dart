@@ -42,7 +42,7 @@ class HomeStateController extends ValueNotifier<HomeState> {
         const Duration(milliseconds: 300),
         (_) {
           var protocolo = _getStringProtocolo();
-          _protocolos.insert(0, protocolo);
+          _protocolos.insert(0, protocolo.replaceAll(String.fromCharCode(2), '{2}').replaceAll(String.fromCharCode(13), '{13}'));
           _protocolos = _protocolos.take(100).toList();
           _broadCast(protocolo);
           value = HomeStateSucess(_protocolos);
