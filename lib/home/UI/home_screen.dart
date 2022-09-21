@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import '../../Utils/currency_imput_formatter.dart';
@@ -120,9 +121,11 @@ class _HomeState extends State<Home> {
               }
               if (state is HomeStateDisconect) {
                 if ((state.messageError ?? "") != "") {
-                  showDialogCustom(context: context, msg: state.messageError!);
+                  _showToast(context, state.messageError!);
+                  
                 }
                 return _returnListProtocolos(state.protocolos ?? []);
+                
               }
               return const SizedBox.shrink();
             },
@@ -131,6 +134,21 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+  
+  void _showToast(BuildContext context, String msg) {
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      /*final scaffold = ScaffoldMessenger.of(context);
+      scaffold.showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          action: SnackBarAction(
+              label: 'Fechar', onPressed: scaffold.hideCurrentSnackBar),
+        ),
+      );*/
+      await showDialogCustom(context: context, msg: msg, nomeButton: 'OK');
+    });
+  }
+
 
   Widget _buildCardDadosPesagem() {
     return Card(

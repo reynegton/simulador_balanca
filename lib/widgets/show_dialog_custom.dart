@@ -49,6 +49,7 @@ Future showDialogCustom({
                       ),
                     ),
               ),
+              actionsAlignment: MainAxisAlignment.center,
         actions: <Widget>[
           exibirCancelar
               ? ElevatedButton(
