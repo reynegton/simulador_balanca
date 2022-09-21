@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 
 import '../States/home_state.dart';
 
 class HomeStateController extends ValueNotifier<HomeState> {
-  String pesoInicialTela = "";
-  String pesoFinalTela = "";
+  int _pesoTela = 0;
   String taraTela = "";
 
   ServerSocket? _serverSocket;
@@ -16,7 +14,11 @@ class HomeStateController extends ValueNotifier<HomeState> {
   final List<Socket> _sockets = [];
 
   HomeStateController() : super(HomeStateDisconect());
-
+  int get getPeso => _pesoTela;
+  void setPeso(int peso) {
+    _pesoTela = peso;
+    value = HomeStateSucess(_protocolos, peso);
+  }
   Future<void> disconectSocket() async {
     for (Socket socket in _sockets) {
       socket.close();
@@ -25,6 +27,7 @@ class HomeStateController extends ValueNotifier<HomeState> {
     _timer.cancel();
     await _serverSocket?.close();
     _serverSocket = null;
+    setPeso(0);
     value = HomeStateDisconect(protocolos: _protocolos);
   }
 
@@ -50,7 +53,7 @@ class HomeStateController extends ValueNotifier<HomeState> {
           );
           _protocolos = _protocolos.take(100).toList();
           _broadCast(protocolo);
-          value = HomeStateSucess(_protocolos);
+          value = HomeStateSucess(_protocolos,_pesoTela);
         },
       );
     } catch (e) {
@@ -101,14 +104,15 @@ class HomeStateController extends ValueNotifier<HomeState> {
   }
 
   String _getStringProtocolo() {
-    var pesoini = double.tryParse(pesoInicialTela) ?? 0;
-    var pesofim = double.tryParse(pesoFinalTela) ?? 0;
-    var peso = Random().nextDouble() * (pesofim - pesoini).abs() + pesoini;
+    //var pesoini = double.tryParse(pesoInicialTela) ?? 0;
+    //var pesofim = double.tryParse(pesoFinalTela) ?? 0;
+    var peso =
+        _pesoTela; //Random().nextDouble() * (pesofim - pesoini).abs() + pesoini;
     var pesoStr =
-        peso.abs().toStringAsFixed(1).replaceAll(',', '').replaceAll('.', '');
+        peso.abs().toString().replaceAll(',', '').replaceAll('.', '');
     var tara = double.tryParse(taraTela) ?? 0;
     var taraStr =
-        tara.abs().toStringAsFixed(1).replaceAll(',', '').replaceAll('.', '');
+        tara.abs().toString().replaceAll(',', '').replaceAll('.', '');
     var protocolo =
         "${String.fromCharCode(2)}+${peso >= 0 ? 'p' : 's'}`${pesoStr.padLeft(6, '0')}${taraStr.padLeft(6, '0')}${String.fromCharCode(13)}";
     return protocolo;

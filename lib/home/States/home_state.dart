@@ -10,5 +10,6 @@ class HomeStateLoading extends HomeState {}
 
 class HomeStateSucess extends HomeState {
   final List<String> protocolos;
-  HomeStateSucess(this.protocolos);
+  final int peso;
+  HomeStateSucess(this.protocolos,this.peso);
 }
