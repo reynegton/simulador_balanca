@@ -197,6 +197,9 @@ class _HomeState extends State<Home> {
                 );
               },
             ),
+            const SizedBox(
+              height: 8,
+            ),
             _buildSliderPeso(),
           ],
         ),
@@ -297,51 +300,64 @@ class _HomeState extends State<Home> {
       builder: (context, state, child) {
         return Column(
           children: [
-            ListTile(
-              enabled: state is HomeStateSucess,
-              title: ValueListenableBuilder(
-                  valueListenable: uiController.casasDecimais,
-                  builder: (context, value, child) {
+            ValueListenableBuilder(
+              valueListenable: uiController.casasDecimais,
+              builder: (context, casasDecimaisValue, child) {
+                return ValueListenableBuilder<int>(
+                  valueListenable: uiController.minMaxValue,
+                  builder: (context, minMaxValue, child) {
                     var pesoFormatado =
                         getValueDivisor(uiController.pesoTela.value);
-                    return Text("Peso: $pesoFormatado");
-                  }),
-              subtitle: ValueListenableBuilder(
-                valueListenable: uiController.casasDecimais,
-                builder: (context, casasDecimaisValue, child) {
-                  return ValueListenableBuilder<int>(
-                    valueListenable: uiController.minMaxValue,
-                    builder: (context, minMaxValue, child) {
-                      var pesoFormatado =
-                          getValueDivisor(uiController.pesoTela.value);
-                      return Row(
-                        children: [
-                          Text(getValueDivisor(-minMaxValue)),
-                          Expanded(
-                            child: Slider(
-                              min: -minMaxValue.toDouble(),
-                              max: minMaxValue.toDouble(),
-                              divisions: minMaxValue > 0 ? 2 * minMaxValue : 1,
-                              value: uiController.pesoTela.value.toDouble(),
-                              label: pesoFormatado,
-                              onChanged: state is HomeStateSucess
-                                  ? (value) {
-                                      uiController.pesoTela.value =
-                                          value.round();
-                                    }
-                                  : null,
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(getValueDivisor(-minMaxValue)),
+                            Text("Peso: $pesoFormatado"),
+                            Text(getValueDivisor(minMaxValue)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Slider(
+                                min: -minMaxValue.toDouble(),
+                                max: minMaxValue.toDouble(),
+                                divisions:
+                                    minMaxValue > 0 ? 2 * minMaxValue : 1,
+                                value: uiController.pesoTela.value.toDouble(),
+                                label: pesoFormatado,
+                                onChanged: state is HomeStateSucess
+                                    ? (value) {
+                                        uiController.pesoTela.value =
+                                            value.round();
+                                      }
+                                    : null,
+                              ),
                             ),
-                          ),
-                          Text(getValueDivisor(minMaxValue)),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
-            Center(
-              child: ElevatedButton(
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              ElevatedButton(
+                onPressed: state is HomeStateSucess ? () {
+                  if (uiController.pesoTela.value > -uiController.minMaxValue.value) {
+                    uiController.decrementarPeso(1);
+                  }
+                }:null,
+                style: ElevatedButton.styleFrom(
+
+                  shape: const CircleBorder(),
+                ),
+                child: const Icon(Icons.exposure_minus_1),
+              ),
+              ElevatedButton(
                 onPressed: state is HomeStateSucess
                     ? () {
                         uiController.pesoTela.value = 0;
@@ -349,7 +365,20 @@ class _HomeState extends State<Home> {
                     : null,
                 child: const Text('Zerar Peso'),
               ),
-            )
+              ElevatedButton(
+                onPressed: state is HomeStateSucess ? () {
+                  if (uiController.pesoTela.value < uiController.minMaxValue.value) {
+                    uiController.incrementarPeso(1);
+                  }
+                  
+                }:null,
+                style: ElevatedButton.styleFrom(
+
+                  shape: const CircleBorder(),
+                ),
+                child: const Icon(Icons.exposure_plus_1),
+              )
+            ])
           ],
         );
       },

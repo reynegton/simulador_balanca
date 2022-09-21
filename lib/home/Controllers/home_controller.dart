@@ -12,6 +12,14 @@ class UiController {
   ValueNotifier<bool> oscilarPeso = ValueNotifier(false);
   ValueNotifier<int> pesoOscilacao = ValueNotifier(0);
   ValueNotifier<int> taraTela = ValueNotifier(0);
+
+  void incrementarPeso(int value){
+    pesoTela.value +=value;
+  }
+
+  void decrementarPeso(int value){
+    pesoTela.value -=value;
+  }
 }
 
 class HomeStateController extends ValueNotifier<HomeState> {
@@ -117,11 +125,15 @@ class HomeStateController extends ValueNotifier<HomeState> {
           uiController.pesoTela.value - uiController.pesoOscilacao.value;
       var pesofim =
           uiController.pesoTela.value + uiController.pesoOscilacao.value;
+      if (pesofim > uiController.minMaxValue.value){
+        pesofim = uiController.minMaxValue.value;
+      }
+      if (pesoini < -uiController.minMaxValue.value){
+        pesoini = -uiController.minMaxValue.value;
+      }
       var diferenca = (pesofim - pesoini).abs();
       if (diferenca > 0) {
-        peso = Random().nextInt(diferenca) + (pesoini <= pesofim
-            ? pesoini
-            : pesofim);
+        peso = Random().nextInt(diferenca) + pesoini;
       } else {
         peso = pesoini;
       }
