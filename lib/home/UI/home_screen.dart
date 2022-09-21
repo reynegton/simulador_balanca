@@ -193,19 +193,24 @@ class _HomeState extends State<Home> {
                           ),
                           Expanded(
                             child: ValueListenableBuilder(
-                              valueListenable: uiController.oscilarPeso,
-                              builder: (context, valueOscilarPeso, widget) {
-                                return TextFormFieldWidget(
-                                  enabled: valueOscilarPeso,
-                                  controller: _textControllerOscilarPeso,
-                                  title: 'Valor Oscilação',
-                                  textInputFormatter: [
-                                    FilteringTextInputFormatter.digitsOnly,
-                                    MaxIntImputFormatter(999999),
-                                    CurrencyInputFormatter(valueCasasDecimais)
-                                  ],
+                              valueListenable: uiController.minMaxValue,
+                              builder: (context,valueMinMax,child) {
+                                return ValueListenableBuilder(
+                                  valueListenable: uiController.oscilarPeso,
+                                  builder: (context, valueOscilarPeso, widget) {
+                                    return TextFormFieldWidget(
+                                      enabled: valueOscilarPeso,
+                                      controller: _textControllerOscilarPeso,
+                                      title: 'Valor Oscilação',
+                                      textInputFormatter: [
+                                        FilteringTextInputFormatter.digitsOnly,
+                                        MaxIntImputFormatter(valueMinMax),
+                                        CurrencyInputFormatter(valueCasasDecimais)
+                                      ],
+                                    );
+                                  },
                                 );
-                              },
+                              }
                             ),
                           ),
                         ],
@@ -452,6 +457,7 @@ class _HomeState extends State<Home> {
         _textControllerMaxMinValue.text =
             getValueDivisor(uiController.minMaxValue.value);
         _textControllerTara.text = getValueDivisor(uiController.taraTela.value);
+        _textControllerOscilarPeso.text = getValueDivisor(uiController.pesoOscilacao.value);
       },
     );
     // #endregion
