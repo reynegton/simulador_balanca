@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: kDebugMode,
       title: 'Flutter Demo',
       theme: ThemeData(
+        //brightness: Brightness.dark,
         primarySwatch: Colors.blue,
       ),
       home: const Home(),

@@ -183,7 +183,7 @@ class _HomeState extends State<Home> {
                             builder: (context, valueOscilar, child) {
                               return Switch(
                                 value: valueOscilar,
-                                activeColor: Colors.blue,
+                                activeColor: Theme.of(context).colorScheme.primary,
                                 onChanged: (bool value) {
                                   uiController.oscilarPeso.value = value;
                                 },
@@ -342,14 +342,15 @@ class _HomeState extends State<Home> {
                               children: [
                                 Text("Peso: $pesoFormatado"),
                                 IconButton(
-                                  onPressed: () async {
+                                  onPressed: state is HomeStateSucess? () async {
                                     await _dialogBuilder(context);
-                                  },
+                                        }
+                                      : null,
                                   icon: Icon(
                                     Icons.edit,
                                     color: state is HomeStateSucess
-                                        ? Colors.blue
-                                        : Colors.grey,
+                                        ?  Theme.of(context).colorScheme.primary
+                                        : null  ,
                                   ),
                                 ),
                               ],
