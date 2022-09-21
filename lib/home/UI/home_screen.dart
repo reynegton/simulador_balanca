@@ -437,7 +437,7 @@ class _HomeState extends State<Home> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Defina o Peso'),
-          content: Container(
+          content: SizedBox(
             height: 100,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
