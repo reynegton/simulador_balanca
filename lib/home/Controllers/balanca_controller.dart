@@ -4,25 +4,11 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 
 import '../States/home_state.dart';
+import 'ui_controller.dart';
 
-class UiController {
-  ValueNotifier<int> minMaxValue = ValueNotifier(999999);
-  ValueNotifier<int> casasDecimais = ValueNotifier(1);
-  ValueNotifier<int> pesoTela = ValueNotifier(0);
-  ValueNotifier<bool> oscilarPeso = ValueNotifier(false);
-  ValueNotifier<int> pesoOscilacao = ValueNotifier(0);
-  ValueNotifier<int> taraTela = ValueNotifier(0);
 
-  void incrementarPeso(int value){
-    pesoTela.value +=value;
-  }
 
-  void decrementarPeso(int value){
-    pesoTela.value -=value;
-  }
-}
-
-class HomeStateController extends ValueNotifier<HomeState> {
+class BalancaController extends ValueNotifier<BalancaState> {
   UiController uiController;
   /*int _pesoTela = 0;
   String taraTela = "";*/
@@ -32,7 +18,7 @@ class HomeStateController extends ValueNotifier<HomeState> {
   List<String> _protocolos = [];
   final List<Socket> _sockets = [];
 
-  HomeStateController(this.uiController) : super(HomeStateDisconect());
+  BalancaController(this.uiController) : super(BalancaStateDisconnect());
 
   Future<void> disconectSocket() async {
     for (var socket in _sockets) {
@@ -43,12 +29,12 @@ class HomeStateController extends ValueNotifier<HomeState> {
     await _serverSocket?.close();
     _serverSocket = null;
     uiController.pesoTela.value = 0;
-    value = HomeStateDisconect(protocolos: _protocolos);
+    value = BalancaStateDisconnect(protocolos: _protocolos);
   }
 
   Future<void> createServer(int porta) async {
     try {
-      value = HomeStateLoading();
+      value = BalancaStateLoading();
       _serverSocket =
           await ServerSocket.bind(InternetAddress.anyIPv4, porta, shared: true);
       _serverSocket?.listen(
@@ -66,11 +52,11 @@ class HomeStateController extends ValueNotifier<HomeState> {
           );
           _protocolos = _protocolos.take(100).toList();
           _broadCast(protocolo);
-          value = HomeStateSucess(_protocolos, uiController.pesoTela.value);
+          value = BalancaStateSucess(_protocolos, uiController.pesoTela.value);
         },
       );
     } on Exception catch (e) {
-      value = HomeStateDisconect(
+      value = BalancaStateDisconnect(
           messageError: e.toString(), protocolos: _protocolos);
     }
   }

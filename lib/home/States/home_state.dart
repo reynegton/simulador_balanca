@@ -1,15 +1,15 @@
-abstract class HomeState {}
+abstract class BalancaState {}
 
-class HomeStateDisconect extends HomeState {
-  HomeStateDisconect({this.messageError, this.protocolos});
+class BalancaStateDisconnect extends BalancaState {
+  BalancaStateDisconnect({this.messageError, this.protocolos});
   String? messageError;
   List<String>? protocolos;
 }
 
-class HomeStateLoading extends HomeState {}
+class BalancaStateLoading extends BalancaState {}
 
-class HomeStateSucess extends HomeState {
+class BalancaStateSucess extends BalancaState {
   final List<String> protocolos;
   final int peso;
-  HomeStateSucess(this.protocolos,this.peso);
+  BalancaStateSucess(this.protocolos,this.peso);
 }

@@ -9,7 +9,8 @@ import '../../Utils/max_int_imput_formatter.dart';
 import '../../Utils/shared_preferences_helper.dart';
 import '../../widgets/show_dialog_custom.dart';
 import '../../widgets/textformfiled.dart';
-import '../Controllers/home_controller.dart';
+import '../Controllers/balanca_controller.dart';
+import '../Controllers/ui_controller.dart';
 import '../States/home_state.dart';
 
 class Home extends StatefulWidget {
@@ -29,7 +30,7 @@ class _HomeState extends State<Home> {
 
   UiController uiController = UiController();
 
-  late HomeStateController homeState;
+  late BalancaController balancaState;
 
   @override
   void initState() {
@@ -41,7 +42,6 @@ class _HomeState extends State<Home> {
     _textControllerMaxMinValue = TextEditingController(text: '99999.9');
     _textControllerCasasDecimais = TextEditingController(text: '1');
 
-    
     initController();
   }
 
@@ -74,18 +74,18 @@ class _HomeState extends State<Home> {
   Widget _buildBottonButons() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ValueListenableBuilder<HomeState>(
-        valueListenable: homeState,
+      child: ValueListenableBuilder<BalancaState>(
+        valueListenable: balancaState,
         builder: (context, state, child) {
           return Row(
             children: [
               Expanded(
                 flex: 1,
                 child: ElevatedButton(
-                  onPressed: (state is HomeStateSucess)
+                  onPressed: (state is BalancaStateSucess)
                       ? null
                       : () {
-                          homeState.createServer(
+                          balancaState.createServer(
                               int.tryParse(_textControllerPorta.text) ?? 0);
                         },
                   child: const Text('Conectar'),
@@ -95,8 +95,8 @@ class _HomeState extends State<Home> {
               Expanded(
                 flex: 1,
                 child: ElevatedButton(
-                  onPressed: (state is HomeStateSucess)
-                      ? homeState.disconectSocket
+                  onPressed: (state is BalancaStateSucess)
+                      ? balancaState.disconectSocket
                       : null,
                   child: const Text('Desconectar'),
                 ),
@@ -113,18 +113,18 @@ class _HomeState extends State<Home> {
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: ValueListenableBuilder<HomeState>(
-            valueListenable: homeState,
+          child: ValueListenableBuilder<BalancaState>(
+            valueListenable: balancaState,
             builder: (context, state, child) {
-              if (state is HomeStateLoading) {
+              if (state is BalancaStateLoading) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
-              if (state is HomeStateSucess) {
+              if (state is BalancaStateSucess) {
                 return _returnListProtocolos(state.protocolos);
               }
-              if (state is HomeStateDisconect) {
+              if (state is BalancaStateDisconnect) {
                 if ((state.messageError ?? "") != "") {
                   _showToast(context, state.messageError!);
                 }
@@ -160,13 +160,13 @@ class _HomeState extends State<Home> {
         padding: const EdgeInsets.only(bottom: 8.0),
         child: Column(
           children: [
-            ValueListenableBuilder<int>(
-              valueListenable: uiController.casasDecimais,
-              builder: (context, valueCasasDecimais, child) {
-                return Row(
-                  children: [
-                    Expanded(
-                      child: TextFormFieldWidget(
+            Row(
+              children: [
+                Expanded(
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: uiController.casasDecimais,
+                    builder: (context, valueCasasDecimais, child) {
+                      return TextFormFieldWidget(
                         controller: _textControllerTara,
                         title: 'Tara',
                         textInputFormatter: [
@@ -174,59 +174,62 @@ class _HomeState extends State<Home> {
                           MaxIntImputFormatter(999999),
                           CurrencyInputFormatter(valueCasasDecimais)
                         ],
-                      ),
-                    ),
-                    _getEspacoRow(),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          const Text("Oscilar Peso"),
-                          ValueListenableBuilder<bool>(
-                            valueListenable: uiController.oscilarPeso,
-                            builder: (context, valueOscilar, child) {
-                              return Switch(
-                                value: valueOscilar,
-                                activeColor: Theme.of(context).colorScheme.primary,
-                                onChanged: (value) {
-                                  uiController.oscilarPeso.value = value;
-                                },
-                              );
+                      );
+                    },
+                  ),
+                ),
+                _getEspacoRow(),
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Text("Oscilar Peso"),
+                      ValueListenableBuilder<bool>(
+                        valueListenable: uiController.oscilarPeso,
+                        builder: (context, valueOscilar, child) {
+                          return Switch(
+                            value: valueOscilar,
+                            activeColor: Theme.of(context).colorScheme.primary,
+                            onChanged: (value) {
+                              uiController.oscilarPeso.value = value;
                             },
-                          ),
-                          Expanded(
-                            child: ValueListenableBuilder(
-                                valueListenable: uiController.minMaxValue,
-                                builder: (context, valueMinMax, child) {
-                                  return ValueListenableBuilder(
-                                    valueListenable: uiController.oscilarPeso,
-                                    builder:
-                                        (context, valueOscilarPeso, widget) {
-                                      return TextFormFieldWidget(
-                                        enabled: valueOscilarPeso,
-                                        controller: _textControllerOscilarPeso,
-                                        title: 'Valor Oscilação',
-                                        textInputFormatter: [
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                          MaxIntImputFormatter(valueMinMax),
-                                          CurrencyInputFormatter(
-                                              valueCasasDecimais)
-                                        ],
-                                      );
-                                    },
-                                  );
-                                }),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    ),
-                  ],
-                );
-              },
+                      Expanded(
+                        child: ValueListenableBuilder(
+                          valueListenable: uiController.minMaxValue,
+                          builder: (context, valueMinMax, child) {
+                            return ValueListenableBuilder(
+                              valueListenable: uiController.oscilarPeso,
+                              builder: (context, valueOscilarPeso, widget) {
+                                return ValueListenableBuilder<int>(
+                                  valueListenable: uiController.casasDecimais,
+                                  builder:
+                                      (context, valueCasasDecimais, child) {
+                                    return TextFormFieldWidget(
+                                      enabled: valueOscilarPeso,
+                                      controller: _textControllerOscilarPeso,
+                                      title: 'Valor Oscilação',
+                                      textInputFormatter: [
+                                        FilteringTextInputFormatter.digitsOnly,
+                                        MaxIntImputFormatter(valueMinMax),
+                                        CurrencyInputFormatter(
+                                            valueCasasDecimais),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            _getEspacoColumn(),
             _buildSliderPeso(),
           ],
         ),
@@ -240,34 +243,35 @@ class _HomeState extends State<Home> {
         title: const Text('Configurações'),
         subtitle: Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: ValueListenableBuilder<HomeState>(
-            valueListenable: homeState,
+          child: ValueListenableBuilder<BalancaState>(
+            valueListenable: balancaState,
             builder: (context, state, child) {
               return Row(
                 children: [
                   Expanded(
                     child: TextFormFieldWidget(
-                      enabled: (state is! HomeStateSucess),
+                      enabled: (state is! BalancaStateSucess),
                       controller: _textControllerPorta,
                       title: 'Porta',
                     ),
                   ),
                   _getEspacoRow(),
                   ValueListenableBuilder<int>(
-                      valueListenable: uiController.casasDecimais,
-                      builder: (context, value, child) {
-                        return Expanded(
-                          child: TextFormFieldWidget(
-                            controller: _textControllerMaxMinValue,
-                            title: 'Min/Max Valor Peso',
-                            textInputFormatter: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              MaxIntImputFormatter(999999),
-                              CurrencyInputFormatter(value),
-                            ],
-                          ),
-                        );
-                      }),
+                    valueListenable: uiController.casasDecimais,
+                    builder: (context, value, child) {
+                      return Expanded(
+                        child: TextFormFieldWidget(
+                          controller: _textControllerMaxMinValue,
+                          title: 'Min/Max Valor Peso',
+                          textInputFormatter: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            MaxIntImputFormatter(999999),
+                            CurrencyInputFormatter(value),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                   _getEspacoRow(),
                   Expanded(
                     child: TextFormFieldWidget(
@@ -321,9 +325,13 @@ class _HomeState extends State<Home> {
     return const SizedBox(width: 10);
   }
 
+  Widget _getEspacoColumn() {
+    return const SizedBox(height: 10);
+  }
+
   Widget _buildSliderPeso() {
     return ValueListenableBuilder(
-      valueListenable: homeState,
+      valueListenable: balancaState,
       builder: (context, state, child) {
         return Column(
           children: [
@@ -345,15 +353,16 @@ class _HomeState extends State<Home> {
                               children: [
                                 Text("Peso: $pesoFormatado"),
                                 IconButton(
-                                  onPressed: state is HomeStateSucess? () async {
-                                    await _dialogBuilder(context);
+                                  onPressed: state is BalancaStateSucess
+                                      ? () async {
+                                          await _dialogBuilder(context);
                                         }
                                       : null,
                                   icon: Icon(
                                     Icons.edit,
-                                    color: state is HomeStateSucess
-                                        ?  Theme.of(context).colorScheme.primary
-                                        : null  ,
+                                    color: state is BalancaStateSucess
+                                        ? Theme.of(context).colorScheme.primary
+                                        : null,
                                   ),
                                 ),
                               ],
@@ -371,7 +380,7 @@ class _HomeState extends State<Home> {
                                     minMaxValue > 0 ? 2 * minMaxValue : 1,
                                 value: uiController.pesoTela.value.toDouble(),
                                 label: pesoFormatado,
-                                onChanged: state is HomeStateSucess
+                                onChanged: state is BalancaStateSucess
                                     ? (value) {
                                         uiController.pesoTela.value =
                                             value.round();
@@ -389,7 +398,7 @@ class _HomeState extends State<Home> {
             ),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               ElevatedButton(
-                onPressed: state is HomeStateSucess
+                onPressed: state is BalancaStateSucess
                     ? () {
                         if (uiController.pesoTela.value >
                             -uiController.minMaxValue.value) {
@@ -403,7 +412,7 @@ class _HomeState extends State<Home> {
                 child: const Icon(Icons.exposure_minus_1),
               ),
               ElevatedButton(
-                onPressed: state is HomeStateSucess
+                onPressed: state is BalancaStateSucess
                     ? () {
                         uiController.pesoTela.value = 0;
                       }
@@ -411,7 +420,7 @@ class _HomeState extends State<Home> {
                 child: const Text('Zerar Peso'),
               ),
               ElevatedButton(
-                onPressed: state is HomeStateSucess
+                onPressed: state is BalancaStateSucess
                     ? () {
                         if (uiController.pesoTela.value <
                             uiController.minMaxValue.value) {
@@ -433,7 +442,8 @@ class _HomeState extends State<Home> {
 
   Future<void> _dialogBuilder(BuildContext context) async {
     var textControllerPeso = TextEditingController();
-    textControllerPeso.text = getValueDivisor(uiController.pesoTela.value.abs());
+    textControllerPeso.text =
+        getValueDivisor(uiController.pesoTela.value.abs());
     var negativo = ValueNotifier<bool>(false);
     negativo.value = uiController.pesoTela.value < 0;
     await showDialog<void>(
@@ -486,10 +496,11 @@ class _HomeState extends State<Home> {
               child: const Text('OK'),
               onPressed: () {
                 uiController.pesoTela.value = (int.tryParse(textControllerPeso
-                        .text
-                        .replaceAll('.', '')
-                        .replaceAll(',', '')) ??
-                    0)*(negativo.value?-1:1);
+                            .text
+                            .replaceAll('.', '')
+                            .replaceAll(',', '')) ??
+                        0) *
+                    (negativo.value ? -1 : 1);
                 Navigator.of(context).pop();
               },
             ),
@@ -500,8 +511,8 @@ class _HomeState extends State<Home> {
     textControllerPeso.clear();
   }
 
-  void initController() async{
-    homeState = HomeStateController(uiController);
+  void initController() async {
+    balancaState = BalancaController(uiController);
     //#region ListenerTextControllers
     _textControllerTara.addListener(
       () {
@@ -533,42 +544,37 @@ class _HomeState extends State<Home> {
           _textControllerOscilarPeso.text = getValueDivisor(minMax);
         }
         uiController.minMaxValue.value = minMax;
-        
+        SharedPreferencesHelper.instance.saveInt(
+            EnumKeysSharedPreferences.ePesoMinMax,
+            uiController.minMaxValue.value);
       },
     );
     _textControllerCasasDecimais.addListener(
       () {
         uiController.casasDecimais.value =
             int.tryParse(_textControllerCasasDecimais.text) ?? 0;
-      },
-    );
 
-    //#endregion
-    // #region ListenerUiController
-    uiController.casasDecimais.addListener(
-      () {
-        SharedPreferencesHelper.instance.saveInt(EnumKeysSharedPreferences.eCasasDecimais, uiController.casasDecimais.value);
-        _textControllerCasasDecimais.text = uiController.casasDecimais.value.toString();
         _textControllerMaxMinValue.text =
             getValueDivisor(uiController.minMaxValue.value);
         _textControllerTara.text = getValueDivisor(uiController.taraTela.value);
         _textControllerOscilarPeso.text =
             getValueDivisor(uiController.pesoOscilacao.value);
+
+        SharedPreferencesHelper.instance.saveInt(
+            EnumKeysSharedPreferences.eCasasDecimais,
+            uiController.casasDecimais.value);
       },
     );
-    uiController.minMaxValue.addListener(
-      () {
-        SharedPreferencesHelper.instance.saveInt(EnumKeysSharedPreferences.ePesoMinMax, uiController.minMaxValue.value);
-      },
-    );
-    // #endregion
-    var minMaxAux = await SharedPreferencesHelper.instance.loadInt(EnumKeysSharedPreferences.ePesoMinMax);
-    if (minMaxAux != null){
+
+    var minMaxAux = await SharedPreferencesHelper.instance
+        .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
+    if (minMaxAux != null) {
       uiController.minMaxValue.value = minMaxAux;
     }
 
-    var casasDecimaisAux = await SharedPreferencesHelper.instance.loadInt(EnumKeysSharedPreferences.eCasasDecimais);
-    if (casasDecimaisAux != null){
+    var casasDecimaisAux = await SharedPreferencesHelper.instance
+        .loadInt(EnumKeysSharedPreferences.eCasasDecimais);
+    if (casasDecimaisAux != null) {
       uiController.casasDecimais.value = casasDecimaisAux;
     }
   }
