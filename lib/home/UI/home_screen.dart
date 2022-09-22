@@ -3,10 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:simulador_balanca/Utils/shared_preferences_helper.dart';
 
 import '../../Utils/currency_imput_formatter.dart';
 import '../../Utils/max_int_imput_formatter.dart';
+import '../../Utils/shared_preferences_helper.dart';
 import '../../widgets/show_dialog_custom.dart';
 import '../../widgets/textformfiled.dart';
 import '../Controllers/home_controller.dart';
@@ -187,7 +187,7 @@ class _HomeState extends State<Home> {
                               return Switch(
                                 value: valueOscilar,
                                 activeColor: Theme.of(context).colorScheme.primary,
-                                onChanged: (bool value) {
+                                onChanged: (value) {
                                   uiController.oscilarPeso.value = value;
                                 },
                               );
@@ -298,7 +298,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget _returnListProtocolos(List<String> listaProtocolos) {
-    final ScrollController firstController = ScrollController();
+    final firstController = ScrollController();
     return Scrollbar(
       thumbVisibility: true,
       controller: firstController,
@@ -438,7 +438,7 @@ class _HomeState extends State<Home> {
     negativo.value = uiController.pesoTela.value < 0;
     await showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return AlertDialog(
           title: const Text('Defina o Peso'),
           content: SizedBox(

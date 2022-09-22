@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:simulador_balanca/home/UI/home_screen.dart';
+
+import 'home/UI/home_screen.dart';
 
 void main() {
   runApp(const MyApp());

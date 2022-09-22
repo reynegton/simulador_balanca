@@ -16,13 +16,13 @@ class CurrencyInputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    double value = double.tryParse(
+    var value = double.tryParse(
             newValue.text.replaceAll('.', '').replaceAll(',', '')) ??
         double.tryParse(
             oldValue.text.replaceAll('.', '').replaceAll(',', '')) ??
         0;
     var fator = pow(10, casasDecimais);
-    String newText = (value / fator).toStringAsFixed(casasDecimais);
+    var newText = (value / fator).toStringAsFixed(casasDecimais);
 
     return newValue.copyWith(
       text: newText,

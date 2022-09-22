@@ -14,7 +14,7 @@ class MaxIntImputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    int value = int.tryParse(
+    var value = int.tryParse(
             newValue.text.replaceAll('.', '').replaceAll(',', '')) ??
         int.tryParse(
             oldValue.text.replaceAll('.', '').replaceAll(',', '')) ??

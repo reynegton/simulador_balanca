@@ -18,9 +18,9 @@ class SharedPreferencesHelper {
 
   Future<bool> deletePrefs(EnumKeysSharedPreferences nameKey) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var prefs = await SharedPreferences.getInstance();
       return await prefs.remove(nameKey.toString());
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print(e);
       }
@@ -29,7 +29,7 @@ class SharedPreferencesHelper {
   }
 
   Future<List<String>> loadAllKeys() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     var retorno = prefs.getKeys().toList();
     return retorno;
   }
@@ -38,7 +38,7 @@ class SharedPreferencesHelper {
   Future<bool> savePreferencesGeneric(
       EnumKeysSharedPreferences nameKey, dynamic value) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var prefs = await SharedPreferences.getInstance();
       if (value is String) {
         return await prefs.setString(nameKey.toString(), value);
       } else if (value is int) {
@@ -50,7 +50,7 @@ class SharedPreferencesHelper {
       } else if (value is List<String>) {
         return await prefs.setStringList(nameKey.toString(), value);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print(e);
       }
@@ -60,7 +60,7 @@ class SharedPreferencesHelper {
 
   Future<dynamic> loadPreferencesGeneric<T>(
       EnumKeysSharedPreferences nameKey) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     if (T is String) {
       return prefs.getString(nameKey.toString()) ?? "";
     } else if (T is int) {
@@ -80,9 +80,9 @@ class SharedPreferencesHelper {
   Future<bool> saveString(
       EnumKeysSharedPreferences nameKey, String value) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var prefs = await SharedPreferences.getInstance();
       return await prefs.setString(nameKey.toString(), value);
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print(e);
       }
@@ -91,8 +91,8 @@ class SharedPreferencesHelper {
   }
 
   Future<String> loadString(EnumKeysSharedPreferences nameKey) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? response = prefs.getString(nameKey.toString());
+    var prefs = await SharedPreferences.getInstance();
+    var response = prefs.getString(nameKey.toString());
     return response ?? "";
   }
 
@@ -102,16 +102,16 @@ class SharedPreferencesHelper {
   Future<bool> saveStringList(
       EnumKeysSharedPreferences nameKey, List<String> value) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var prefs = await SharedPreferences.getInstance();
       return await prefs.setStringList(nameKey.toString(), value);
-    } catch (e) {
+    } on Exception catch (_) {
       return false;
     }
   }
 
   Future<List<String>> loadStringList(EnumKeysSharedPreferences nameKey) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? response = prefs.getStringList(nameKey.toString());
+    var prefs = await SharedPreferences.getInstance();
+    var response = prefs.getStringList(nameKey.toString());
     return response ?? [];
   }
 
@@ -120,9 +120,9 @@ class SharedPreferencesHelper {
   // #region Boolean
   Future<bool> saveBool(EnumKeysSharedPreferences nameKey, bool value) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var prefs = await SharedPreferences.getInstance();
       return await prefs.setBool(nameKey.toString(), value);
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print(e);
       }
@@ -131,7 +131,7 @@ class SharedPreferencesHelper {
   }
 
   Future<bool?> loadBool(EnumKeysSharedPreferences nameKey) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     return prefs.getBool(nameKey.toString());
   }
 
@@ -140,9 +140,9 @@ class SharedPreferencesHelper {
   // #region Integer
   Future<bool> saveInt(EnumKeysSharedPreferences nameKey, int value) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var prefs = await SharedPreferences.getInstance();
       return await prefs.setInt(nameKey.toString(), value);
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print(e);
       }
@@ -151,7 +151,7 @@ class SharedPreferencesHelper {
   }
 
   Future<int?> loadInt(EnumKeysSharedPreferences nameKey) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     return prefs.getInt(nameKey.toString());
   }
 
@@ -161,9 +161,9 @@ class SharedPreferencesHelper {
   Future<bool> saveDouble(
       EnumKeysSharedPreferences nameKey, double value) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var prefs = await SharedPreferences.getInstance();
       return await prefs.setDouble(nameKey.toString(), value);
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print(e);
       }
@@ -172,7 +172,7 @@ class SharedPreferencesHelper {
   }
 
   Future<double?> loadDouble(EnumKeysSharedPreferences nameKey) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     return prefs.getDouble(nameKey.toString());
   }
   // #endregion

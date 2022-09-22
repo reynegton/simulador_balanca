@@ -35,7 +35,7 @@ class HomeStateController extends ValueNotifier<HomeState> {
   HomeStateController(this.uiController) : super(HomeStateDisconect());
 
   Future<void> disconectSocket() async {
-    for (Socket socket in _sockets) {
+    for (var socket in _sockets) {
       socket.close();
     }
     _sockets.clear();
@@ -52,9 +52,7 @@ class HomeStateController extends ValueNotifier<HomeState> {
       _serverSocket =
           await ServerSocket.bind(InternetAddress.anyIPv4, porta, shared: true);
       _serverSocket?.listen(
-        (client) {
-          _handleConnection(client);
-        },
+        _handleConnection,
       );
       _timer = Timer.periodic(
         const Duration(milliseconds: 300),
@@ -71,7 +69,7 @@ class HomeStateController extends ValueNotifier<HomeState> {
           value = HomeStateSucess(_protocolos, uiController.pesoTela.value);
         },
       );
-    } catch (e) {
+    } on Exception catch (e) {
       value = HomeStateDisconect(
           messageError: e.toString(), protocolos: _protocolos);
     }
@@ -88,7 +86,7 @@ class HomeStateController extends ValueNotifier<HomeState> {
     // listen for events from the client
     client.listen(
       // handle data from the client
-      (Uint8List data) {
+      (data) {
         final message = String.fromCharCodes(data);
         if (kDebugMode) {
           print(message);
@@ -113,7 +111,7 @@ class HomeStateController extends ValueNotifier<HomeState> {
   }
 
   _broadCast(String message) {
-    for (Socket socket in _sockets) {
+    for (var socket in _sockets) {
       socket.write(message);
     }
   }
