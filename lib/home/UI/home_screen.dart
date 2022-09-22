@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:simulador_balanca/Utils/shared_preferences_helper.dart';
 
 import '../../Utils/currency_imput_formatter.dart';
 import '../../Utils/max_int_imput_formatter.dart';
@@ -39,6 +40,8 @@ class _HomeState extends State<Home> {
     _textControllerOscilarPeso = TextEditingController(text: '0.0');
     _textControllerMaxMinValue = TextEditingController(text: '99999.9');
     _textControllerCasasDecimais = TextEditingController(text: '1');
+
+    
     initController();
   }
 
@@ -497,7 +500,7 @@ class _HomeState extends State<Home> {
     textControllerPeso.clear();
   }
 
-  void initController() {
+  void initController() async{
     homeState = HomeStateController(uiController);
     //#region ListenerTextControllers
     _textControllerTara.addListener(
@@ -530,6 +533,7 @@ class _HomeState extends State<Home> {
           _textControllerOscilarPeso.text = getValueDivisor(minMax);
         }
         uiController.minMaxValue.value = minMax;
+        
       },
     );
     _textControllerCasasDecimais.addListener(
@@ -543,6 +547,8 @@ class _HomeState extends State<Home> {
     // #region ListenerUiController
     uiController.casasDecimais.addListener(
       () {
+        SharedPreferencesHelper.instance.saveInt(EnumKeysSharedPreferences.eCasasDecimais, uiController.casasDecimais.value);
+        _textControllerCasasDecimais.text = uiController.casasDecimais.value.toString();
         _textControllerMaxMinValue.text =
             getValueDivisor(uiController.minMaxValue.value);
         _textControllerTara.text = getValueDivisor(uiController.taraTela.value);
@@ -550,6 +556,20 @@ class _HomeState extends State<Home> {
             getValueDivisor(uiController.pesoOscilacao.value);
       },
     );
+    uiController.minMaxValue.addListener(
+      () {
+        SharedPreferencesHelper.instance.saveInt(EnumKeysSharedPreferences.ePesoMinMax, uiController.minMaxValue.value);
+      },
+    );
     // #endregion
+    var minMaxAux = await SharedPreferencesHelper.instance.loadInt(EnumKeysSharedPreferences.ePesoMinMax);
+    if (minMaxAux != null){
+      uiController.minMaxValue.value = minMaxAux;
+    }
+
+    var casasDecimaisAux = await SharedPreferencesHelper.instance.loadInt(EnumKeysSharedPreferences.eCasasDecimais);
+    if (casasDecimaisAux != null){
+      uiController.casasDecimais.value = casasDecimaisAux;
+    }
   }
 }
