@@ -259,7 +259,7 @@ class _HomeState extends State<Home> {
                         return Expanded(
                           child: TextFormFieldWidget(
                             controller: _textControllerMaxMinValue,
-                            title: 'Min/Max Valor',
+                            title: 'Min/Max Valor Peso',
                             textInputFormatter: [
                               FilteringTextInputFormatter.digitsOnly,
                               MaxIntImputFormatter(999999),
