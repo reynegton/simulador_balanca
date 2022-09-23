@@ -560,6 +560,12 @@ class _HomeState extends State<Home> {
         SharedPreferencesHelper.instance.saveInt(
             EnumKeysSharedPreferences.eCasasDecimais,
             uiController.casasDecimais.value);
+
+        _textControllerMaxMinValue.text =
+            getValueDivisor(uiController.minMaxValue.value);
+        _textControllerTara.text = getValueDivisor(uiController.taraTela.value);
+        _textControllerOscilarPeso.text =
+            getValueDivisor(uiController.pesoOscilacao.value);
       },
     );
     uiController.minMaxValue.addListener(
@@ -570,23 +576,19 @@ class _HomeState extends State<Home> {
       },
     );
     // #endregion
-    var minMaxAux = await SharedPreferencesHelper.instance
-        .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
-    if (minMaxAux != null) {
-      uiController.minMaxValue.value = minMaxAux;
-      _textControllerCasasDecimais.text =
-          uiController.casasDecimais.value.toString();
-      _textControllerMaxMinValue.text =
-          getValueDivisor(uiController.minMaxValue.value);
-      _textControllerTara.text = getValueDivisor(uiController.taraTela.value);
-      _textControllerOscilarPeso.text =
-          getValueDivisor(uiController.pesoOscilacao.value);
-    }
 
     var casasDecimaisAux = await SharedPreferencesHelper.instance
         .loadInt(EnumKeysSharedPreferences.eCasasDecimais);
     if (casasDecimaisAux != null) {
       uiController.casasDecimais.value = casasDecimaisAux;
+      _textControllerCasasDecimais.text =
+          uiController.casasDecimais.value.toString();
+    }
+
+    var minMaxAux = await SharedPreferencesHelper.instance
+        .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
+    if (minMaxAux != null) {
+      uiController.minMaxValue.value = minMaxAux;
       _textControllerMaxMinValue.text =
           getValueDivisor(uiController.minMaxValue.value);
     }
