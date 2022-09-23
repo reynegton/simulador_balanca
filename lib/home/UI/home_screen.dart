@@ -21,12 +21,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late TextEditingController _textControllerPorta;
-  late TextEditingController _textControllerTara;
-
-  late TextEditingController _textControllerOscilarPeso;
-  late TextEditingController _textControllerMaxMinValue;
-  late TextEditingController _textControllerCasasDecimais;
+  final _textControllerPorta = TextEditingController(text: '32211');
+  final _textControllerTara = TextEditingController(text: '0.0');
+  final _textControllerOscilarPeso = TextEditingController(text: '0.0');
+  final _textControllerMaxMinValue = TextEditingController(text: '99999.9');
+  final _textControllerCasasDecimais = TextEditingController(text: '1');
+  final _textControllerPeso = TextEditingController(text: '0.0');
 
   UiController uiController = UiController();
 
@@ -36,18 +36,17 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
 
-    _textControllerPorta = TextEditingController(text: '32211');
-    _textControllerTara = TextEditingController(text: '0.0');
-    _textControllerOscilarPeso = TextEditingController(text: '0.0');
-    _textControllerMaxMinValue = TextEditingController(text: '99999.9');
-    _textControllerCasasDecimais = TextEditingController(text: '1');
-
     initController();
   }
 
   @override
   void dispose() {
     _textControllerPorta.dispose();
+    _textControllerTara.dispose();
+    _textControllerOscilarPeso.dispose();
+    _textControllerMaxMinValue.dispose();
+    _textControllerCasasDecimais.dispose();
+    _textControllerPeso.dispose();
     super.dispose();
   }
 
@@ -348,8 +347,16 @@ class _HomeState extends State<Home> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(getValueDivisor(-minMaxValue)),
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  getValueDivisor(-minMaxValue),
+                                ),
+                              ),
+                            ),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text("Peso: $pesoFormatado"),
                                 IconButton(
@@ -367,7 +374,14 @@ class _HomeState extends State<Home> {
                                 ),
                               ],
                             ),
-                            Text(getValueDivisor(minMaxValue)),
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  getValueDivisor(minMaxValue),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                         Row(
