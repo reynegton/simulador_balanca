@@ -543,38 +543,42 @@ class _HomeState extends State<Home> {
         if (minMax <= uiController.pesoOscilacao.value) {
           _textControllerOscilarPeso.text = getValueDivisor(minMax);
         }
-        uiController.minMaxValue.value = minMax;
-        SharedPreferencesHelper.instance.saveInt(
-            EnumKeysSharedPreferences.ePesoMinMax,
-            uiController.minMaxValue.value);
+        uiController.minMaxValue.value = minMax; 
       },
     );
     _textControllerCasasDecimais.addListener(
       () {
         uiController.casasDecimais.value =
             int.tryParse(_textControllerCasasDecimais.text) ?? 0;
+      },
+    );
 
+    //#endregion
+    // #region ListenerUiController
+    uiController.casasDecimais.addListener(
+      () {
+        SharedPreferencesHelper.instance.saveInt(EnumKeysSharedPreferences.eCasasDecimais, uiController.casasDecimais.value);
+        _textControllerCasasDecimais.text = uiController.casasDecimais.value.toString();
         _textControllerMaxMinValue.text =
             getValueDivisor(uiController.minMaxValue.value);
         _textControllerTara.text = getValueDivisor(uiController.taraTela.value);
         _textControllerOscilarPeso.text =
             getValueDivisor(uiController.pesoOscilacao.value);
-
-        SharedPreferencesHelper.instance.saveInt(
-            EnumKeysSharedPreferences.eCasasDecimais,
-            uiController.casasDecimais.value);
       },
     );
-
-    var minMaxAux = await SharedPreferencesHelper.instance
-        .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
-    if (minMaxAux != null) {
+    uiController.minMaxValue.addListener(
+      () {
+        SharedPreferencesHelper.instance.saveInt(EnumKeysSharedPreferences.ePesoMinMax, uiController.minMaxValue.value);
+      },
+    );
+    // #endregion
+    var minMaxAux = await SharedPreferencesHelper.instance.loadInt(EnumKeysSharedPreferences.ePesoMinMax);
+    if (minMaxAux != null){
       uiController.minMaxValue.value = minMaxAux;
     }
 
-    var casasDecimaisAux = await SharedPreferencesHelper.instance
-        .loadInt(EnumKeysSharedPreferences.eCasasDecimais);
-    if (casasDecimaisAux != null) {
+    var casasDecimaisAux = await SharedPreferencesHelper.instance.loadInt(EnumKeysSharedPreferences.eCasasDecimais);
+    if (casasDecimaisAux != null){
       uiController.casasDecimais.value = casasDecimaisAux;
     }
   }
