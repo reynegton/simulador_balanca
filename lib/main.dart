@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
-      title: 'Flutter Demo',
+      title: 'Simulador Balança IP',
       theme: ThemeData(
         //brightness: Brightness.dark,
         primarySwatch: Colors.blue,
