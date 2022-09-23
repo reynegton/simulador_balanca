@@ -569,7 +569,10 @@ class _HomeState extends State<Home> {
     uiController.minMaxValue.addListener(
       () {
         SharedPreferencesHelper.instance.saveInt(EnumKeysSharedPreferences.ePesoMinMax, uiController.minMaxValue.value);
+        _textControllerMaxMinValue.text =
+            getValueDivisor(uiController.minMaxValue.value);
       },
+      
     );
     // #endregion
     var minMaxAux = await SharedPreferencesHelper.instance.loadInt(EnumKeysSharedPreferences.ePesoMinMax);
