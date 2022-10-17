@@ -18,6 +18,7 @@ class TextFormFieldWidget extends StatelessWidget {
   final int? maxLine;
   final bool? enabled;
   final bool obscuredText;
+  final bool autoFocus;
   final TextInputAction? textInputAction;
   final TextCapitalization? textCapitalization;
   final bool alignLabelWithHint;
@@ -41,6 +42,7 @@ class TextFormFieldWidget extends StatelessWidget {
     this.maxLength,
     this.minLine,
     this.maxLine,
+    this.autoFocus = false,
     this.enabled = true,
     this.obscuredText = false,
     this.textInputAction,
@@ -57,6 +59,7 @@ class TextFormFieldWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      autofocus: autoFocus,
       initialValue: initialValue,
       focusNode: focusNode,
       maxLength: maxLength,

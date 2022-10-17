@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-class MaxIntImputFormatter extends TextInputFormatter {
-  int maxIntValue;
-  MaxIntImputFormatter(this.maxIntValue);
+class MAxValueImputFormatter extends TextInputFormatter {
+  int maxValue;
+  int decimalPrecision;
+  MAxValueImputFormatter(this.maxValue,this.decimalPrecision);
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
@@ -15,12 +16,12 @@ class MaxIntImputFormatter extends TextInputFormatter {
     }
 
     var value = int.tryParse(
-            newValue.text.replaceAll('.', '').replaceAll(',', '')) ??
+            (double.tryParse(newValue.text)??0).toStringAsFixed(decimalPrecision).replaceAll('.', '').replaceAll(',', '')) ??
         int.tryParse(
-            oldValue.text.replaceAll('.', '').replaceAll(',', '')) ??
+            (double.tryParse(oldValue.text)??0).toStringAsFixed(decimalPrecision).replaceAll('.', '').replaceAll(',', '')) ??
         0;
 
-    var newText = (value<=maxIntValue)?value.toString():oldValue.text.replaceAll('.', '').replaceAll(',', '');
+    var newText = (value<=maxValue)?newValue.text:oldValue.text;
     return newValue.copyWith(
       text: newText,
       selection: TextSelection.collapsed(offset: newText.length),

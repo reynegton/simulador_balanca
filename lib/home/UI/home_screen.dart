@@ -5,7 +5,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import '../../Utils/currency_imput_formatter.dart';
-import '../../Utils/max_int_imput_formatter.dart';
+import '../../Utils/currency_input_formatter_free_edit.dart';
+import '../../Utils/max_value_imput_formatter.dart';
 import '../../Utils/shared_preferences_helper.dart';
 import '../../widgets/show_dialog_custom.dart';
 import '../../widgets/textformfiled.dart';
@@ -27,6 +28,9 @@ class _HomeState extends State<Home> {
   final _textControllerMaxMinValue = TextEditingController(text: '99999.9');
   final _textControllerCasasDecimais = TextEditingController(text: '1');
   final _textControllerPeso = TextEditingController(text: '0.0');
+  final _focusNodeTara = FocusNode();
+  final _focusNodeOscilarPeso = FocusNode();
+  final _focusNodeMinMaxValue = FocusNode();
 
   UiController uiController = UiController();
 
@@ -37,6 +41,26 @@ class _HomeState extends State<Home> {
     super.initState();
 
     initController();
+    _focusNodeTara.addListener(() {
+      if (_focusNodeTara.hasFocus) {
+        _textControllerTara.selection = TextSelection(
+            baseOffset: 0, extentOffset: _textControllerTara.text.length);
+      }
+    });
+    _focusNodeOscilarPeso.addListener(() {
+      if (_focusNodeOscilarPeso.hasFocus) {
+        _textControllerOscilarPeso.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _textControllerOscilarPeso.text.length);
+      }
+    });
+    _focusNodeMinMaxValue.addListener(() {
+      if (_focusNodeMinMaxValue.hasFocus) {
+        _textControllerMaxMinValue.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _textControllerMaxMinValue.text.length);
+      }
+    });
   }
 
   @override
@@ -47,6 +71,9 @@ class _HomeState extends State<Home> {
     _textControllerMaxMinValue.dispose();
     _textControllerCasasDecimais.dispose();
     _textControllerPeso.dispose();
+    _focusNodeTara.dispose();
+    _focusNodeOscilarPeso.dispose();
+    _focusNodeMinMaxValue.dispose();
     super.dispose();
   }
 
@@ -167,11 +194,15 @@ class _HomeState extends State<Home> {
                     builder: (context, valueCasasDecimais, child) {
                       return TextFormFieldWidget(
                         controller: _textControllerTara,
+                        focusNode: _focusNodeTara,
                         title: 'Tara',
                         textInputFormatter: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          MaxIntImputFormatter(999999),
-                          CurrencyInputFormatter(valueCasasDecimais)
+                          CurrencyInputFormatterFreeEdit(
+                              acceptNegative: false,
+                              decimalPrecision: valueCasasDecimais),
+                          MAxValueImputFormatter(
+                            999999,valueCasasDecimais
+                          ),
                         ],
                       );
                     },
@@ -207,13 +238,15 @@ class _HomeState extends State<Home> {
                                       (context, valueCasasDecimais, child) {
                                     return TextFormFieldWidget(
                                       enabled: valueOscilarPeso,
+                                      focusNode: _focusNodeOscilarPeso,
                                       controller: _textControllerOscilarPeso,
                                       title: 'Valor Oscilação',
                                       textInputFormatter: [
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        MaxIntImputFormatter(valueMinMax),
-                                        CurrencyInputFormatter(
-                                            valueCasasDecimais),
+                                        CurrencyInputFormatterFreeEdit(
+                                            acceptNegative: false,
+                                            decimalPrecision:
+                                                valueCasasDecimais),
+                                        MAxValueImputFormatter(valueMinMax,valueCasasDecimais),
                                       ],
                                     );
                                   },
@@ -261,12 +294,16 @@ class _HomeState extends State<Home> {
                       return Expanded(
                         child: TextFormFieldWidget(
                           controller: _textControllerMaxMinValue,
+                          focusNode: _focusNodeMinMaxValue,
                           title: 'Min/Max Valor Peso',
                           textInputFormatter: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            MaxIntImputFormatter(999999),
-                            CurrencyInputFormatter(value),
-                          ],
+                    CurrencyInputFormatterFreeEdit(
+                        acceptNegative: false,
+                        decimalPrecision: value),
+                    MAxValueImputFormatter(999999,0),
+                  ],
+                  
+      
                         ),
                       );
                     },
@@ -278,7 +315,7 @@ class _HomeState extends State<Home> {
                       title: 'Casas Decimais',
                       textInputFormatter: [
                         FilteringTextInputFormatter.digitsOnly,
-                        MaxIntImputFormatter(5),
+                        MAxValueImputFormatter(5,0),
                         CurrencyInputFormatter(0),
                       ],
                     ),
@@ -456,10 +493,18 @@ class _HomeState extends State<Home> {
 
   Future<void> _dialogBuilder(BuildContext context) async {
     var textControllerPeso = TextEditingController();
+    final _focusNode = FocusNode();
+
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        textControllerPeso.selection = TextSelection(
+            baseOffset: 0, extentOffset: textControllerPeso.text.length);
+      }
+    });
+
     textControllerPeso.text =
         getValueDivisor(uiController.pesoTela.value.abs());
-    var negativo = ValueNotifier<bool>(false);
-    negativo.value = uiController.pesoTela.value < 0;
+
     await showDialog<void>(
       context: context,
       builder: (context) {
@@ -471,23 +516,16 @@ class _HomeState extends State<Home> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                ValueListenableBuilder<bool>(
-                    valueListenable: negativo,
-                    builder: (context, valueNegativo, child) {
-                      return CheckboxListTile(
-                        dense: true,
-                        value: valueNegativo,
-                        onChanged: (value) => negativo.value = value ?? false,
-                        title: const Text('Negativo'),
-                      );
-                    }),
                 TextFormFieldWidget(
                   controller: textControllerPeso,
+                  focusNode: _focusNode,
+                  autoFocus: true,
                   title: "Peso",
                   textInputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    MaxIntImputFormatter(uiController.minMaxValue.value),
-                    CurrencyInputFormatter(uiController.casasDecimais.value)
+                    CurrencyInputFormatterFreeEdit(
+                        acceptNegative: true,
+                        decimalPrecision: uiController.casasDecimais.value),
+                    MAxValueImputFormatter(uiController.minMaxValue.value,uiController.casasDecimais.value),
                   ],
                 ),
               ],
@@ -509,12 +547,12 @@ class _HomeState extends State<Home> {
               ),
               child: const Text('OK'),
               onPressed: () {
-                uiController.pesoTela.value = (int.tryParse(textControllerPeso
-                            .text
+                uiController.pesoTela.value = (int.tryParse(
+                        (double.tryParse(textControllerPeso.text) ?? 0)
+                            .toStringAsFixed(uiController.casasDecimais.value)
                             .replaceAll('.', '')
                             .replaceAll(',', '')) ??
-                        0) *
-                    (negativo.value ? -1 : 1);
+                    0);
                 Navigator.of(context).pop();
               },
             ),
@@ -530,7 +568,7 @@ class _HomeState extends State<Home> {
     //#region ListenerTextControllers
     _textControllerTara.addListener(
       () {
-        uiController.taraTela.value = int.tryParse(_textControllerTara.text
+        uiController.taraTela.value = int.tryParse( (double.tryParse(_textControllerTara.text)??0).toStringAsFixed(uiController.casasDecimais.value)
                 .replaceAll('.', '')
                 .replaceAll(',', '')) ??
             0;
@@ -539,7 +577,7 @@ class _HomeState extends State<Home> {
     _textControllerOscilarPeso.addListener(
       () {
         uiController.pesoOscilacao.value = int.tryParse(
-                _textControllerOscilarPeso.text
+                (double.tryParse(_textControllerOscilarPeso.text)??0).toStringAsFixed(uiController.casasDecimais.value)
                     .replaceAll('.', '')
                     .replaceAll(',', '')) ??
             0;
@@ -547,7 +585,7 @@ class _HomeState extends State<Home> {
     );
     _textControllerMaxMinValue.addListener(
       () {
-        var minMax = int.tryParse(_textControllerMaxMinValue.text
+        var minMax = int.tryParse((double.tryParse(_textControllerMaxMinValue.text)??0).toStringAsFixed(uiController.casasDecimais.value)
                 .replaceAll('.', '')
                 .replaceAll(',', '')) ??
             0;
