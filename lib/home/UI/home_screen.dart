@@ -285,7 +285,7 @@ class _HomeState extends State<Home> {
                           textInputFormatter: [
                             CurrencyInputFormatterFreeEdit(
                                 acceptNegative: false, decimalPrecision: value),
-                            MaxValueImputFormatter(999999, 0),
+                            MaxValueImputFormatter(999999, 2),
                           ],
                         ),
                       );
