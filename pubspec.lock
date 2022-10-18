@@ -43,6 +43,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
+  easy_splash_screen:
+    dependency: "direct main"
+    description:
+      name: easy_splash_screen
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.4"
   effective_dart:
     dependency: "direct main"
     description:

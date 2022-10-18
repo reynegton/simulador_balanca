@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:simulador_balanca/theme_manager.dart';
+
+import '../theme_manager.dart';
 
 class MyDrawerMenu extends StatelessWidget {
   const MyDrawerMenu({super.key});
