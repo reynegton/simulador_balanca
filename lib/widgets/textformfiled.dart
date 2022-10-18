@@ -88,7 +88,7 @@ class TextFormFieldWidget extends StatelessWidget {
         labelText: title,
         labelStyle: TextStyle(
           fontSize: 13,
-          color: Colors.blueGrey.shade800,
+          //color: Colors.blueGrey.shade800,
           fontWeight: FontWeight.bold,
         ),
       ),

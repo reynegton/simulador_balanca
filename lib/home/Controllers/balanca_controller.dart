@@ -3,13 +3,13 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 
-import '../States/home_state.dart';
-import 'ui_controller.dart';
+import '../States/balanca_state.dart';
+import 'home_controller.dart';
 
 
 
 class BalancaController extends ValueNotifier<BalancaState> {
-  UiController uiController;
+  HomeController uiController;
   /*int _pesoTela = 0;
   String taraTela = "";*/
 
