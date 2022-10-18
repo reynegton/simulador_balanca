@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-class MAxValueImputFormatter extends TextInputFormatter {
+class MaxValueImputFormatter extends TextInputFormatter {
   int maxValue;
   int decimalPrecision;
-  MAxValueImputFormatter(this.maxValue,this.decimalPrecision);
+  MaxValueImputFormatter(this.maxValue,this.decimalPrecision);
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
