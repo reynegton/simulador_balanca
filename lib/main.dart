@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'home/UI/home_screen.dart';
+import 'splash_page.dart';
 import 'theme_manager.dart';
 
 void main() {
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: kDebugMode,
         title: 'Simulador Balança IP',
         theme: theme.getTheme(),
-        home: const Home(),
+        home: SplashPage(),
       ),
     );
   }
