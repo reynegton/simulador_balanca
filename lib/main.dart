@@ -1,10 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'home/UI/home_screen.dart';
+import 'theme_manager.dart';
 
 void main() {
-  runApp(const MyApp());
+  return runApp(
+    ChangeNotifierProvider<ThemeNotifier>(
+      create: (_) => ThemeNotifier(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -12,14 +19,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: kDebugMode,
-      title: 'Simulador Balança IP',
-      theme: ThemeData(
-        //brightness: Brightness.dark,
-        primarySwatch: Colors.blue,
+    return Consumer<ThemeNotifier>(
+      builder: (context, theme, child) => MaterialApp(
+        debugShowCheckedModeBanner: kDebugMode,
+        title: 'Simulador Balança IP',
+        theme: theme.getTheme(),
+        home: const Home(),
       ),
-      home: const Home(),
     );
   }
 }

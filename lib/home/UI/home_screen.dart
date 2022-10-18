@@ -6,6 +6,7 @@ import '../../Utils/currency_imput_formatter.dart';
 import '../../Utils/currency_input_formatter_free_edit.dart';
 import '../../Utils/max_value_imput_formatter.dart';
 import '../../Utils/shared_preferences_helper.dart';
+import '../../widgets/my_drawer_menu.dart';
 import '../../widgets/show_dialog_custom.dart';
 import '../../widgets/textformfiled.dart';
 import '../Controllers/balanca_controller.dart';
@@ -71,6 +72,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: MyDrawerMenu(),
       appBar: AppBar(
         title: const Text('Simulador Balança'),
       ),
@@ -547,8 +549,7 @@ class _HomeState extends State<Home> {
         .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
     if (minMaxAux != null) {
       uiController.setMinMaxIntValue(minMaxAux);
-       _textControllerMaxMinValue.text =
-            uiController.getValueDivisor(minMaxAux);
+      _textControllerMaxMinValue.text = uiController.getValueDivisor(minMaxAux);
     }
   }
 

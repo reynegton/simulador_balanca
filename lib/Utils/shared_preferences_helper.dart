@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum EnumKeysSharedPreferences {
   ePesoMinMax,
   eCasasDecimais,
+  eThemeMode
 }
 
 class SharedPreferencesHelper {
