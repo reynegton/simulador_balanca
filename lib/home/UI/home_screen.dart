@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -11,8 +9,8 @@ import '../../Utils/shared_preferences_helper.dart';
 import '../../widgets/show_dialog_custom.dart';
 import '../../widgets/textformfiled.dart';
 import '../Controllers/balanca_controller.dart';
-import '../Controllers/ui_controller.dart';
-import '../States/home_state.dart';
+import '../Controllers/home_controller.dart';
+import '../States/balanca_state.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -24,7 +22,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final _textControllerPorta = TextEditingController(text: '32211');
   final _textControllerTara = TextEditingController(text: '0.0');
-  final _textControllerOscilarPeso = TextEditingController(text: '0.0');
+  final _textControllerPesoOscilacao = TextEditingController(text: '0.0');
   final _textControllerMaxMinValue = TextEditingController(text: '99999.9');
   final _textControllerCasasDecimais = TextEditingController(text: '1');
   final _textControllerPeso = TextEditingController(text: '0.0');
@@ -32,42 +30,35 @@ class _HomeState extends State<Home> {
   final _focusNodeOscilarPeso = FocusNode();
   final _focusNodeMinMaxValue = FocusNode();
 
-  UiController uiController = UiController();
+  HomeController uiController = HomeController();
 
   late BalancaController balancaState;
+
+  void _addFocusNodeListener(
+      FocusNode focus, TextEditingController textEditing) {
+    focus.addListener(() {
+      if (focus.hasFocus) {
+        textEditing.selection =
+            TextSelection(baseOffset: 0, extentOffset: textEditing.text.length);
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
 
     initController();
-    _focusNodeTara.addListener(() {
-      if (_focusNodeTara.hasFocus) {
-        _textControllerTara.selection = TextSelection(
-            baseOffset: 0, extentOffset: _textControllerTara.text.length);
-      }
-    });
-    _focusNodeOscilarPeso.addListener(() {
-      if (_focusNodeOscilarPeso.hasFocus) {
-        _textControllerOscilarPeso.selection = TextSelection(
-            baseOffset: 0,
-            extentOffset: _textControllerOscilarPeso.text.length);
-      }
-    });
-    _focusNodeMinMaxValue.addListener(() {
-      if (_focusNodeMinMaxValue.hasFocus) {
-        _textControllerMaxMinValue.selection = TextSelection(
-            baseOffset: 0,
-            extentOffset: _textControllerMaxMinValue.text.length);
-      }
-    });
+    _addFocusNodeListener(_focusNodeTara, _textControllerTara);
+    _addFocusNodeListener(_focusNodeOscilarPeso, _textControllerPesoOscilacao);
+    _addFocusNodeListener(_focusNodeMinMaxValue, _textControllerMaxMinValue);
   }
 
   @override
   void dispose() {
     _textControllerPorta.dispose();
     _textControllerTara.dispose();
-    _textControllerOscilarPeso.dispose();
+    _textControllerPesoOscilacao.dispose();
     _textControllerMaxMinValue.dispose();
     _textControllerCasasDecimais.dispose();
     _textControllerPeso.dispose();
@@ -152,7 +143,7 @@ class _HomeState extends State<Home> {
               }
               if (state is BalancaStateDisconnect) {
                 if ((state.messageError ?? "") != "") {
-                  _showToast(context, state.messageError!);
+                  _showMessage(context, state.messageError!);
                 }
                 return _returnListProtocolos(state.protocolos ?? []);
               }
@@ -164,18 +155,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void _showToast(BuildContext context, String msg) {
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      /*final scaffold = ScaffoldMessenger.of(context);
-      scaffold.showSnackBar(
-        SnackBar(
-          content: Text(msg),
-          action: SnackBarAction(
-              label: 'Fechar', onPressed: scaffold.hideCurrentSnackBar),
-        ),
-      );*/
-      await showDialogCustom(context: context, msg: msg, nomeButton: 'OK');
-    });
+  void _showMessage(BuildContext context, String msg) {
+    SchedulerBinding.instance.addPostFrameCallback(
+      (_) async {
+        await showDialogCustom(context: context, msg: msg, nomeButton: 'OK');
+      },
+    );
   }
 
   Widget _buildCardDadosPesagem() {
@@ -200,9 +185,7 @@ class _HomeState extends State<Home> {
                           CurrencyInputFormatterFreeEdit(
                               acceptNegative: false,
                               decimalPrecision: valueCasasDecimais),
-                          MAxValueImputFormatter(
-                            999999,valueCasasDecimais
-                          ),
+                          MaxValueImputFormatter(999999, valueCasasDecimais),
                         ],
                       );
                     },
@@ -239,14 +222,15 @@ class _HomeState extends State<Home> {
                                     return TextFormFieldWidget(
                                       enabled: valueOscilarPeso,
                                       focusNode: _focusNodeOscilarPeso,
-                                      controller: _textControllerOscilarPeso,
+                                      controller: _textControllerPesoOscilacao,
                                       title: 'Valor Oscilação',
                                       textInputFormatter: [
                                         CurrencyInputFormatterFreeEdit(
                                             acceptNegative: false,
                                             decimalPrecision:
                                                 valueCasasDecimais),
-                                        MAxValueImputFormatter(valueMinMax,valueCasasDecimais),
+                                        MaxValueImputFormatter(
+                                            valueMinMax, valueCasasDecimais),
                                       ],
                                     );
                                   },
@@ -297,13 +281,10 @@ class _HomeState extends State<Home> {
                           focusNode: _focusNodeMinMaxValue,
                           title: 'Min/Max Valor Peso',
                           textInputFormatter: [
-                    CurrencyInputFormatterFreeEdit(
-                        acceptNegative: false,
-                        decimalPrecision: value),
-                    MAxValueImputFormatter(999999,0),
-                  ],
-                  
-      
+                            CurrencyInputFormatterFreeEdit(
+                                acceptNegative: false, decimalPrecision: value),
+                            MaxValueImputFormatter(999999, 0),
+                          ],
                         ),
                       );
                     },
@@ -315,7 +296,7 @@ class _HomeState extends State<Home> {
                       title: 'Casas Decimais',
                       textInputFormatter: [
                         FilteringTextInputFormatter.digitsOnly,
-                        MAxValueImputFormatter(5,0),
+                        MaxValueImputFormatter(5, 0),
                         CurrencyInputFormatter(0),
                       ],
                     ),
@@ -327,14 +308,6 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
-  }
-
-  String getValueDivisor(int valorOriginal) {
-    return (valorOriginal /
-            (uiController.casasDecimais.value > 0
-                ? pow(10, uiController.casasDecimais.value)
-                : 1))
-        .toStringAsFixed(uiController.casasDecimais.value);
   }
 
   Widget _returnListProtocolos(List<String> listaProtocolos) {
@@ -377,8 +350,8 @@ class _HomeState extends State<Home> {
                 return ValueListenableBuilder<int>(
                   valueListenable: uiController.minMaxValue,
                   builder: (context, minMaxValue, child) {
-                    var pesoFormatado =
-                        getValueDivisor(uiController.pesoTela.value);
+                    var pesoFormatado = uiController
+                        .getValueDivisor(uiController.pesoTela.value);
                     return Column(
                       children: [
                         Row(
@@ -388,7 +361,7 @@ class _HomeState extends State<Home> {
                               child: Container(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  getValueDivisor(-minMaxValue),
+                                  uiController.getValueDivisor(-minMaxValue),
                                 ),
                               ),
                             ),
@@ -415,7 +388,7 @@ class _HomeState extends State<Home> {
                               child: Container(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  getValueDivisor(minMaxValue),
+                                  uiController.getValueDivisor(minMaxValue),
                                 ),
                               ),
                             ),
@@ -495,15 +468,17 @@ class _HomeState extends State<Home> {
     var textControllerPeso = TextEditingController();
     final _focusNode = FocusNode();
 
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        textControllerPeso.selection = TextSelection(
-            baseOffset: 0, extentOffset: textControllerPeso.text.length);
-      }
-    });
+    _focusNode.addListener(
+      () {
+        if (_focusNode.hasFocus) {
+          textControllerPeso.selection = TextSelection(
+              baseOffset: 0, extentOffset: textControllerPeso.text.length);
+        }
+      },
+    );
 
     textControllerPeso.text =
-        getValueDivisor(uiController.pesoTela.value.abs());
+        uiController.getValueDivisor(uiController.pesoTela.value.abs());
 
     await showDialog<void>(
       context: context,
@@ -525,7 +500,8 @@ class _HomeState extends State<Home> {
                     CurrencyInputFormatterFreeEdit(
                         acceptNegative: true,
                         decimalPrecision: uiController.casasDecimais.value),
-                    MAxValueImputFormatter(uiController.minMaxValue.value,uiController.casasDecimais.value),
+                    MaxValueImputFormatter(uiController.minMaxValue.value,
+                        uiController.casasDecimais.value),
                   ],
                 ),
               ],
@@ -547,12 +523,8 @@ class _HomeState extends State<Home> {
               ),
               child: const Text('OK'),
               onPressed: () {
-                uiController.pesoTela.value = (int.tryParse(
-                        (double.tryParse(textControllerPeso.text) ?? 0)
-                            .toStringAsFixed(uiController.casasDecimais.value)
-                            .replaceAll('.', '')
-                            .replaceAll(',', '')) ??
-                    0);
+                uiController.pesoTela.value =
+                    uiController.getValuePesosInt(textControllerPeso.text);
                 Navigator.of(context).pop();
               },
             ),
@@ -563,50 +535,49 @@ class _HomeState extends State<Home> {
     textControllerPeso.clear();
   }
 
+  Future<void> _loadPreferencesValue() async {
+    var casasDecimaisAux = await SharedPreferencesHelper.instance
+        .loadInt(EnumKeysSharedPreferences.eCasasDecimais);
+    if (casasDecimaisAux != null) {
+      uiController.setCasasDecimais(casasDecimaisAux.toString());
+      _textControllerCasasDecimais.text = casasDecimaisAux.toString();
+    }
+
+    var minMaxAux = await SharedPreferencesHelper.instance
+        .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
+    if (minMaxAux != null) {
+      uiController.setMinMaxIntValue(minMaxAux);
+       _textControllerMaxMinValue.text =
+            uiController.getValueDivisor(minMaxAux);
+    }
+  }
+
   void initController() async {
     balancaState = BalancaController(uiController);
     //#region ListenerTextControllers
     _textControllerTara.addListener(
       () {
-        uiController.taraTela.value = int.tryParse( (double.tryParse(_textControllerTara.text)??0).toStringAsFixed(uiController.casasDecimais.value)
-                .replaceAll('.', '')
-                .replaceAll(',', '')) ??
-            0;
+        uiController.setTaraTelaValue(_textControllerTara.text);
       },
     );
-    _textControllerOscilarPeso.addListener(
+    _textControllerPesoOscilacao.addListener(
       () {
-        uiController.pesoOscilacao.value = int.tryParse(
-                (double.tryParse(_textControllerOscilarPeso.text)??0).toStringAsFixed(uiController.casasDecimais.value)
-                    .replaceAll('.', '')
-                    .replaceAll(',', '')) ??
-            0;
+        uiController.setPesoOscilacao(_textControllerPesoOscilacao.text);
       },
     );
     _textControllerMaxMinValue.addListener(
       () {
-        var minMax = int.tryParse((double.tryParse(_textControllerMaxMinValue.text)??0).toStringAsFixed(uiController.casasDecimais.value)
-                .replaceAll('.', '')
-                .replaceAll(',', '')) ??
-            0;
-        if (minMax <= uiController.pesoTela.value) {
-          uiController.pesoTela.value = minMax;
-        }
-        if (minMax <= uiController.pesoOscilacao.value) {
-          _textControllerOscilarPeso.text = getValueDivisor(minMax);
-        }
-        uiController.minMaxValue.value = minMax;
+        uiController.setMinMaxValue(_textControllerMaxMinValue.text);
       },
     );
     _textControllerCasasDecimais.addListener(
       () {
-        uiController.casasDecimais.value =
-            int.tryParse(_textControllerCasasDecimais.text) ?? 0;
+        uiController.setCasasDecimais(_textControllerCasasDecimais.text);
       },
     );
 
     //#endregion
-    // #region ListenerUiController
+    //#region ListenerUiController
     uiController.casasDecimais.addListener(
       () {
         SharedPreferencesHelper.instance.saveInt(
@@ -614,10 +585,11 @@ class _HomeState extends State<Home> {
             uiController.casasDecimais.value);
 
         _textControllerMaxMinValue.text =
-            getValueDivisor(uiController.minMaxValue.value);
-        _textControllerTara.text = getValueDivisor(uiController.taraTela.value);
-        _textControllerOscilarPeso.text =
-            getValueDivisor(uiController.pesoOscilacao.value);
+            uiController.getValueDivisor(uiController.minMaxValue.value);
+        _textControllerTara.text =
+            uiController.getValueDivisor(uiController.taraTela.value);
+        _textControllerPesoOscilacao.text =
+            uiController.getValueDivisor(uiController.pesoOscilacao.value);
       },
     );
     uiController.minMaxValue.addListener(
@@ -628,21 +600,6 @@ class _HomeState extends State<Home> {
       },
     );
     // #endregion
-
-    var casasDecimaisAux = await SharedPreferencesHelper.instance
-        .loadInt(EnumKeysSharedPreferences.eCasasDecimais);
-    if (casasDecimaisAux != null) {
-      uiController.casasDecimais.value = casasDecimaisAux;
-      _textControllerCasasDecimais.text =
-          uiController.casasDecimais.value.toString();
-    }
-
-    var minMaxAux = await SharedPreferencesHelper.instance
-        .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
-    if (minMaxAux != null) {
-      uiController.minMaxValue.value = minMaxAux;
-      _textControllerMaxMinValue.text =
-          getValueDivisor(uiController.minMaxValue.value);
-    }
+    await _loadPreferencesValue();
   }
 }
