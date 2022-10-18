@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class UiController {
+class HomeController {
   ValueNotifier<int> minMaxValue = ValueNotifier(999999);
   ValueNotifier<int> casasDecimais = ValueNotifier(1);
   ValueNotifier<int> pesoTela = ValueNotifier(0);

@@ -9,8 +9,8 @@ import '../../Utils/shared_preferences_helper.dart';
 import '../../widgets/show_dialog_custom.dart';
 import '../../widgets/textformfiled.dart';
 import '../Controllers/balanca_controller.dart';
-import '../Controllers/ui_controller.dart';
-import '../States/home_state.dart';
+import '../Controllers/home_controller.dart';
+import '../States/balanca_state.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -30,7 +30,7 @@ class _HomeState extends State<Home> {
   final _focusNodeOscilarPeso = FocusNode();
   final _focusNodeMinMaxValue = FocusNode();
 
-  UiController uiController = UiController();
+  HomeController uiController = HomeController();
 
   late BalancaController balancaState;
 
