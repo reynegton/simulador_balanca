@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -67,5 +68,18 @@ class HomeController {
             .replaceAll('.', '')
             .replaceAll(',', '')) ??
         0;
+  }
+
+  Future<List<String>> printIps() async {
+    var listaResultado = <String>[];
+    for (var interface in await NetworkInterface.list()) {
+      print('== Interface: ${interface.name} ==');
+      for (var addr in interface.addresses
+          .where((element) => element.type.name == 'IPv4')
+          .toList()) {
+            listaResultado.add(addr.address);
+      }
+    }
+    return listaResultado;
   }
 }

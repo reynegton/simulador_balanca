@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -88,6 +90,41 @@ class _HomeState extends State<Home> {
       ),
       bottomNavigationBar: _buildBottonButons(),
     );
+  }
+
+  Widget _buildContainerDropDown(List<String> listaValores) {
+    var dropdownValue = listaValores.isNotEmpty ? listaValores.first : "";
+    return Row(children: [
+      Text("Endereço"),
+      SizedBox(
+        width: 8,
+      ),
+      listaValores.length == 1
+          ? DropdownButton<String>(
+              value: dropdownValue,
+              icon: const Icon(Icons.arrow_downward),
+              elevation: 16,
+              underline: Container(
+                height: 2,
+              ),
+              onChanged: (String? value) {
+                // This is called when the user selects an item.
+                setState(() {
+                  dropdownValue = value!;
+                });
+              },
+              items: listaValores.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            )
+          : Text(dropdownValue),
+          SizedBox(
+        width: 8,
+      ),
+    ]);
   }
 
   Widget _buildBottonButons() {
@@ -266,6 +303,11 @@ class _HomeState extends State<Home> {
             builder: (context, state, child) {
               return Row(
                 children: [
+                  FutureBuilder<List<String>>(
+                      future: uiController.printIps(),
+                      builder: (context, value) {
+                        return _buildContainerDropDown(value.data ?? []);
+                      }),
                   Expanded(
                     child: TextFormFieldWidget(
                       enabled: (state is! BalancaStateSucess),
