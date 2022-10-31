@@ -32,11 +32,11 @@ class BalancaController extends ValueNotifier<BalancaState> {
     value = BalancaStateDisconnect(protocolos: _protocolos);
   }
 
-  Future<void> createServer(int porta) async {
+  Future<void> createServer(String ip, int porta) async {
     try {
       value = BalancaStateLoading();
       _serverSocket =
-          await ServerSocket.bind(InternetAddress.anyIPv4, porta, shared: true);
+          await ServerSocket.bind(ip, porta, shared: true);
       _serverSocket?.listen(
         _handleConnection,
       );

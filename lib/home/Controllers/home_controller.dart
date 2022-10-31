@@ -10,6 +10,8 @@ class HomeController {
   ValueNotifier<bool> oscilarPeso = ValueNotifier(false);
   ValueNotifier<int> pesoOscilacao = ValueNotifier(0);
   ValueNotifier<int> taraTela = ValueNotifier(0);
+  ValueNotifier<String> enderecoIP = ValueNotifier("");
+  ValueNotifier<List<String>> listaEnderecosIP = ValueNotifier(<String>[]);
 
   void incrementarPeso(int value) {
     pesoTela.value += value;
@@ -40,6 +42,7 @@ class HomeController {
     }
     minMaxValue.value = minMax;
   }
+
   void setMinMaxIntValue(int value) {
     var minMax = value;
     minMaxValue.value = minMax;
@@ -70,16 +73,19 @@ class HomeController {
         0;
   }
 
-  Future<List<String>> printIps() async {
+  Future<void> setEnderecosIp() async {
     var listaResultado = <String>[];
     for (var interface in await NetworkInterface.list()) {
       print('== Interface: ${interface.name} ==');
       for (var addr in interface.addresses
           .where((element) => element.type.name == 'IPv4')
           .toList()) {
-            listaResultado.add(addr.address);
+        listaResultado.add(addr.address);
       }
     }
-    return listaResultado;
+    for (var element in listaResultado) {
+      listaEnderecosIP.value.add(element);
+    }
+    enderecoIP.value = listaResultado.first;
   }
 }

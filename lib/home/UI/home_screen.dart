@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -50,7 +48,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-
     initController();
     _addFocusNodeListener(_focusNodeTara, _textControllerTara);
     _addFocusNodeListener(_focusNodeOscilarPeso, _textControllerPesoOscilacao);
@@ -92,39 +89,55 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildContainerDropDown(List<String> listaValores) {
-    var dropdownValue = listaValores.isNotEmpty ? listaValores.first : "";
-    return Row(children: [
-      Text("Endereço"),
-      SizedBox(
-        width: 8,
-      ),
-      listaValores.length == 1
-          ? DropdownButton<String>(
-              value: dropdownValue,
-              icon: const Icon(Icons.arrow_downward),
-              elevation: 16,
-              underline: Container(
-                height: 2,
+  Widget _buildEnderecoIP(List<String> listaValores) {
+    return ValueListenableBuilder<BalancaState>(
+      valueListenable: balancaState,
+      builder: (context, state, child) => AbsorbPointer(
+        absorbing: (state is BalancaStateSucess),
+        child: Row(
+          children: [
+            Text(
+              "Endereço",
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
               ),
-              onChanged: (String? value) {
-                // This is called when the user selects an item.
-                setState(() {
-                  dropdownValue = value!;
-                });
-              },
-              items: listaValores.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            )
-          : Text(dropdownValue),
-          SizedBox(
-        width: 8,
+            ),
+            SizedBox(
+              width: 8,
+            ),
+            listaValores.length > 1
+                ? ValueListenableBuilder<String>(
+                    valueListenable: uiController.enderecoIP,
+                    builder: (context, valueIP, _) {
+                      return DropdownButton<String>(
+                        isDense: true,
+                        value: valueIP,
+                        icon: const Icon(Icons.arrow_downward),
+                        elevation: 16,
+                        underline: Container(
+                          height: 2,
+                        ),
+                        onChanged: (value) {
+                          uiController.enderecoIP.value = value ?? "";
+                        },
+                        items:
+                            listaValores.map<DropdownMenuItem<String>>((value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      );
+                    })
+                : Text(uiController.enderecoIP.value),
+            SizedBox(
+              width: 8,
+            ),
+          ],
+        ),
       ),
-    ]);
+    );
   }
 
   Widget _buildBottonButons() {
@@ -142,6 +155,7 @@ class _HomeState extends State<Home> {
                       ? null
                       : () {
                           balancaState.createServer(
+                              uiController.enderecoIP.value,
                               int.tryParse(_textControllerPorta.text) ?? 0);
                         },
                   child: const Text('Conectar'),
@@ -303,11 +317,12 @@ class _HomeState extends State<Home> {
             builder: (context, state, child) {
               return Row(
                 children: [
-                  FutureBuilder<List<String>>(
-                      future: uiController.printIps(),
-                      builder: (context, value) {
-                        return _buildContainerDropDown(value.data ?? []);
-                      }),
+                  ValueListenableBuilder<List<String>>(
+                    valueListenable: uiController.listaEnderecosIP,
+                    builder: (context, valuelist, child) {
+                      return _buildEnderecoIP(valuelist);
+                    },
+                  ),
                   Expanded(
                     child: TextFormFieldWidget(
                       enabled: (state is! BalancaStateSucess),
@@ -644,5 +659,6 @@ class _HomeState extends State<Home> {
     );
     // #endregion
     await _loadPreferencesValue();
+    await uiController.setEnderecosIp();
   }
 }
