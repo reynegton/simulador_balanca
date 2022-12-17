@@ -28,7 +28,7 @@ class BalancaController extends ValueNotifier<BalancaState> {
     _timer.cancel();
     await _serverSocket?.close();
     _serverSocket = null;
-    uiController.pesoTela.value = 0;
+    uiController.pesoTela = 0;
     value = BalancaStateDisconnect(protocolos: _protocolos);
   }
 
@@ -52,7 +52,7 @@ class BalancaController extends ValueNotifier<BalancaState> {
           );
           _protocolos = _protocolos.take(100).toList();
           _broadCast(protocolo);
-          value = BalancaStateSucess(_protocolos, uiController.pesoTela.value);
+          value = BalancaStateSucess(_protocolos, uiController.pesoTela);
         },
       );
     } on Exception catch (e) {
@@ -104,16 +104,16 @@ class BalancaController extends ValueNotifier<BalancaState> {
 
   String _getStringProtocolo() {
     var peso = 0;
-    if (uiController.oscilarPeso.value) {
+    if (uiController.oscilarPeso) {
       var pesoini =
-          uiController.pesoTela.value - uiController.pesoOscilacao.value;
+          uiController.pesoTela - uiController.pesoOscilacao;
       var pesofim =
-          uiController.pesoTela.value + uiController.pesoOscilacao.value;
-      if (pesofim > uiController.minMaxValue.value){
-        pesofim = uiController.minMaxValue.value;
+          uiController.pesoTela + uiController.pesoOscilacao;
+      if (pesofim > uiController.minMaxValue){
+        pesofim = uiController.minMaxValue;
       }
-      if (pesoini < -uiController.minMaxValue.value){
-        pesoini = -uiController.minMaxValue.value;
+      if (pesoini < -uiController.minMaxValue){
+        pesoini = -uiController.minMaxValue;
       }
       var diferenca = (pesofim - pesoini).abs();
       if (diferenca > 0) {
@@ -122,11 +122,11 @@ class BalancaController extends ValueNotifier<BalancaState> {
         peso = pesoini;
       }
     } else {
-      peso = uiController.pesoTela.value;
+      peso = uiController.pesoTela;
     }
 
     var pesoStr = peso.abs().toString();
-    var tara = uiController.taraTela.value;
+    var tara = uiController.taraTela;
     var taraStr = tara.abs().toString();
     var protocolo =
         "${String.fromCharCode(2)}+${peso >= 0 ? 'p' : 's'}`${pesoStr.padLeft(6, '0')}${taraStr.padLeft(6, '0')}${String.fromCharCode(13)}";

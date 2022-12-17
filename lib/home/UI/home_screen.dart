@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../../Utils/currency_imput_formatter.dart';
 import '../../Utils/currency_input_formatter_free_edit.dart';
@@ -30,8 +31,6 @@ class _HomeState extends State<Home> {
   final _focusNodeTara = FocusNode();
   final _focusNodeOscilarPeso = FocusNode();
   final _focusNodeMinMaxValue = FocusNode();
-
-  HomeController uiController = HomeController();
 
   late BalancaController balancaState;
 
@@ -176,21 +175,20 @@ class _HomeState extends State<Home> {
             Row(
               children: [
                 Expanded(
-                  child: ValueListenableBuilder<int>(
-                    valueListenable: uiController.casasDecimais,
-                    builder: (context, valueCasasDecimais, child) {
+                  child: Consumer<HomeController>(
+                     builder: (context, repository, child) {
                       return TextFormFieldWidget(
-                        controller: _textControllerTara,
-                        focusNode: _focusNodeTara,
-                        title: 'Tara',
-                        textInputFormatter: [
-                          CurrencyInputFormatterFreeEdit(
-                              acceptNegative: false,
-                              decimalPrecision: valueCasasDecimais),
-                          MaxValueImputFormatter(999999, valueCasasDecimais),
-                        ],
-                      );
-                    },
+                            controller: _textControllerTara,
+                            focusNode: _focusNodeTara,
+                            title: 'Tara',
+                            textInputFormatter: [
+                              CurrencyInputFormatterFreeEdit(
+                                  acceptNegative: false,
+                                  decimalPrecision: repository.casasDecimais),
+                              MaxValueImputFormatter(999999, repository.casasDecimais),
+                            ],
+                          );
+                    }
                   ),
                 ),
                 _getEspacoRow(),
@@ -198,31 +196,22 @@ class _HomeState extends State<Home> {
                   child: Row(
                     children: [
                       const Text("Oscilar Peso"),
-                      ValueListenableBuilder<bool>(
-                        valueListenable: uiController.oscilarPeso,
-                        builder: (context, valueOscilar, child) {
+                      Consumer<HomeController>(
+                        builder: (context, repository, child) {
                           return Switch(
-                            value: valueOscilar,
+                            value: repository.oscilarPeso,
                             activeColor: Theme.of(context).colorScheme.primary,
                             onChanged: (value) {
-                              uiController.oscilarPeso.value = value;
+                              repository.oscilarPeso = !repository.oscilarPeso;
                             },
                           );
                         },
                       ),
                       Expanded(
-                        child: ValueListenableBuilder(
-                          valueListenable: uiController.minMaxValue,
-                          builder: (context, valueMinMax, child) {
-                            return ValueListenableBuilder(
-                              valueListenable: uiController.oscilarPeso,
-                              builder: (context, valueOscilarPeso, widget) {
-                                return ValueListenableBuilder<int>(
-                                  valueListenable: uiController.casasDecimais,
-                                  builder:
-                                      (context, valueCasasDecimais, child) {
-                                    return TextFormFieldWidget(
-                                      enabled: valueOscilarPeso,
+                        child: Consumer<HomeController>(
+                          builder: (context, repository, child) {
+                            return TextFormFieldWidget(
+                                      enabled: repository.oscilarPeso,
                                       focusNode: _focusNodeOscilarPeso,
                                       controller: _textControllerPesoOscilacao,
                                       title: 'Valor Oscilação',
@@ -230,15 +219,11 @@ class _HomeState extends State<Home> {
                                         CurrencyInputFormatterFreeEdit(
                                             acceptNegative: false,
                                             decimalPrecision:
-                                                valueCasasDecimais),
+                                                repository.casasDecimais),
                                         MaxValueImputFormatter(
-                                            valueMinMax, valueCasasDecimais),
+                                            repository.minMaxValue, repository.casasDecimais),
                                       ],
                                     );
-                                  },
-                                );
-                              },
-                            );
                           },
                         ),
                       ),
@@ -274,9 +259,8 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   _getEspacoRow(),
-                  ValueListenableBuilder<int>(
-                    valueListenable: uiController.casasDecimais,
-                    builder: (context, value, child) {
+                  Consumer<HomeController>(
+                    builder: (context, repository, child) {
                       return Expanded(
                         child: TextFormFieldWidget(
                           controller: _textControllerMaxMinValue,
@@ -284,7 +268,7 @@ class _HomeState extends State<Home> {
                           title: 'Min/Max Valor Peso',
                           textInputFormatter: [
                             CurrencyInputFormatterFreeEdit(
-                                acceptNegative: false, decimalPrecision: value),
+                                acceptNegative: false, decimalPrecision: repository.casasDecimais),
                             MaxValueImputFormatter(999999, 2),
                           ],
                         ),
@@ -346,14 +330,11 @@ class _HomeState extends State<Home> {
       builder: (context, state, child) {
         return Column(
           children: [
-            ValueListenableBuilder(
-              valueListenable: uiController.casasDecimais,
-              builder: (context, casasDecimaisValue, child) {
-                return ValueListenableBuilder<int>(
-                  valueListenable: uiController.minMaxValue,
-                  builder: (context, minMaxValue, child) {
-                    var pesoFormatado = uiController
-                        .getValueDivisor(uiController.pesoTela.value);
+            Consumer<HomeController>(
+
+              builder: (context, repository, child) {
+                var pesoFormatado = repository
+                        .getValueDivisor(repository.pesoTela);
                     return Column(
                       children: [
                         Row(
@@ -363,7 +344,7 @@ class _HomeState extends State<Home> {
                               child: Container(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  uiController.getValueDivisor(-minMaxValue),
+                                  repository.getValueDivisor(-repository.minMaxValue),
                                 ),
                               ),
                             ),
@@ -390,7 +371,7 @@ class _HomeState extends State<Home> {
                               child: Container(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  uiController.getValueDivisor(minMaxValue),
+                                  repository.getValueDivisor(repository.minMaxValue),
                                 ),
                               ),
                             ),
@@ -400,15 +381,15 @@ class _HomeState extends State<Home> {
                           children: [
                             Expanded(
                               child: Slider(
-                                min: -minMaxValue.toDouble(),
-                                max: minMaxValue.toDouble(),
+                                min: -repository.minMaxValue.toDouble(),
+                                max: repository.minMaxValue.toDouble(),
                                 divisions:
-                                    minMaxValue > 0 ? 2 * minMaxValue : 1,
-                                value: uiController.pesoTela.value.toDouble(),
+                                    repository.minMaxValue > 0 ? 2 * repository.minMaxValue : 1,
+                                value: repository.pesoTela.toDouble(),
                                 label: pesoFormatado,
                                 onChanged: state is BalancaStateSucess
                                     ? (value) {
-                                        uiController.pesoTela.value =
+                                        repository.pesoTela =
                                             value.round();
                                       }
                                     : null,
@@ -418,17 +399,15 @@ class _HomeState extends State<Home> {
                         ),
                       ],
                     );
-                  },
-                );
               },
             ),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               ElevatedButton(
                 onPressed: state is BalancaStateSucess
                     ? () {
-                        if (uiController.pesoTela.value >
-                            -uiController.minMaxValue.value) {
-                          uiController.decrementarPeso(1);
+                        if (context.read<HomeController>().pesoTela >
+                            -context.read<HomeController>().minMaxValue) {
+                          context.read<HomeController>().decrementarPeso(1);
                         }
                       }
                     : null,
@@ -440,7 +419,7 @@ class _HomeState extends State<Home> {
               ElevatedButton(
                 onPressed: state is BalancaStateSucess
                     ? () {
-                        uiController.pesoTela.value = 0;
+                        context.read<HomeController>().pesoTela = 0;
                       }
                     : null,
                 child: const Text('Zerar Peso'),
@@ -448,9 +427,9 @@ class _HomeState extends State<Home> {
               ElevatedButton(
                 onPressed: state is BalancaStateSucess
                     ? () {
-                        if (uiController.pesoTela.value <
-                            uiController.minMaxValue.value) {
-                          uiController.incrementarPeso(1);
+                        if (context.read<HomeController>().pesoTela <
+                            context.read<HomeController>().minMaxValue) {
+                          context.read<HomeController>().incrementarPeso(1);
                         }
                       }
                     : null,
@@ -480,7 +459,7 @@ class _HomeState extends State<Home> {
     );
 
     textControllerPeso.text =
-        uiController.getValueDivisor(uiController.pesoTela.value.abs());
+        context.read<HomeController>().getValueDivisor(context.read<HomeController>().pesoTela.abs());
 
     await showDialog<void>(
       context: context,
@@ -501,9 +480,9 @@ class _HomeState extends State<Home> {
                   textInputFormatter: [
                     CurrencyInputFormatterFreeEdit(
                         acceptNegative: true,
-                        decimalPrecision: uiController.casasDecimais.value),
-                    MaxValueImputFormatter(uiController.minMaxValue.value,
-                        uiController.casasDecimais.value),
+                        decimalPrecision: context.read<HomeController>().casasDecimais),
+                    MaxValueImputFormatter(context.read<HomeController>().minMaxValue,
+                        context.read<HomeController>().casasDecimais),
                   ],
                 ),
               ],
@@ -525,8 +504,8 @@ class _HomeState extends State<Home> {
               ),
               child: const Text('OK'),
               onPressed: () {
-                uiController.pesoTela.value =
-                    uiController.getValuePesosInt(textControllerPeso.text);
+                context.read<HomeController>().pesoTela =
+                    context.read<HomeController>().getValuePesosInt(textControllerPeso.text);
                 Navigator.of(context).pop();
               },
             ),
@@ -541,45 +520,45 @@ class _HomeState extends State<Home> {
     var casasDecimaisAux = await SharedPreferencesHelper.instance
         .loadInt(EnumKeysSharedPreferences.eCasasDecimais);
     if (casasDecimaisAux != null) {
-      uiController.setCasasDecimais(casasDecimaisAux.toString());
+      context.read<HomeController>().setCasasDecimais(casasDecimaisAux.toString());
       _textControllerCasasDecimais.text = casasDecimaisAux.toString();
     }
 
     var minMaxAux = await SharedPreferencesHelper.instance
         .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
     if (minMaxAux != null) {
-      uiController.setMinMaxIntValue(minMaxAux);
-      _textControllerMaxMinValue.text = uiController.getValueDivisor(minMaxAux);
+      context.read<HomeController>().setMinMaxIntValue(minMaxAux);
+      _textControllerMaxMinValue.text = context.read<HomeController>().getValueDivisor(minMaxAux);
     }
   }
 
   void initController() async {
-    balancaState = BalancaController(uiController);
+    balancaState = BalancaController(context.read<HomeController>());
     //#region ListenerTextControllers
     _textControllerTara.addListener(
       () {
-        uiController.setTaraTelaValue(_textControllerTara.text);
+        context.read<HomeController>().setTaraTelaValue(_textControllerTara.text);
       },
     );
     _textControllerPesoOscilacao.addListener(
       () {
-        uiController.setPesoOscilacao(_textControllerPesoOscilacao.text);
+        context.read<HomeController>().setPesoOscilacao(_textControllerPesoOscilacao.text);
       },
     );
     _textControllerMaxMinValue.addListener(
       () {
-        uiController.setMinMaxValue(_textControllerMaxMinValue.text);
+        context.read<HomeController>().setMinMaxValue(_textControllerMaxMinValue.text);
       },
     );
     _textControllerCasasDecimais.addListener(
       () {
-        uiController.setCasasDecimais(_textControllerCasasDecimais.text);
+        context.read<HomeController>().setCasasDecimais(_textControllerCasasDecimais.text);
       },
     );
 
     //#endregion
     //#region ListenerUiController
-    uiController.casasDecimais.addListener(
+    /*uiController.casasDecimais.addListener(
       () {
         SharedPreferencesHelper.instance.saveInt(
             EnumKeysSharedPreferences.eCasasDecimais,
@@ -599,7 +578,7 @@ class _HomeState extends State<Home> {
             EnumKeysSharedPreferences.ePesoMinMax,
             uiController.minMaxValue.value);
       },
-    );
+    );*/
     // #endregion
     await _loadPreferencesValue();
   }
