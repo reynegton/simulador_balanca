@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import '../../Utils/currency_imput_formatter.dart';
 import '../../Utils/currency_input_formatter_free_edit.dart';
 import '../../Utils/max_value_imput_formatter.dart';
-import '../../Utils/shared_preferences_helper.dart';
 import '../../widgets/my_drawer_menu.dart';
 import '../../widgets/show_dialog_custom.dart';
 import '../../widgets/textformfiled.dart';
@@ -21,35 +20,59 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final _textControllerPorta = TextEditingController(text: '32211');
-  final _textControllerTara = TextEditingController(text: '0.0');
-  final _textControllerPesoOscilacao = TextEditingController(text: '0.0');
-  final _textControllerMaxMinValue = TextEditingController(text: '99999.9');
-  final _textControllerCasasDecimais = TextEditingController(text: '1');
-  final _textControllerPeso = TextEditingController(text: '0.0');
-  final _focusNodeTara = FocusNode();
-  final _focusNodeOscilarPeso = FocusNode();
-  final _focusNodeMinMaxValue = FocusNode();
+  late TextEditingController _textControllerPorta;
+  late TextEditingController _textControllerTara;
+  late TextEditingController _textControllerPesoOscilacao;
+  late TextEditingController _textControllerMaxMinValue;
+  late TextEditingController _textControllerCasasDecimais;
+  late TextEditingController _textControllerPeso;
+  late TextEditingController _textControllerEndereco;
+  late FocusNode _focusNodeTara;
+  late FocusNode _focusNodeOscilarPeso;
+  late FocusNode _focusNodeMinMaxValue;
 
-  HomeController uiController = HomeController();
+  late HomeController uiController;
 
   late BalancaController balancaState;
 
   void _addFocusNodeListener(
       FocusNode focus, TextEditingController textEditing) {
-    focus.addListener(() {
-      if (focus.hasFocus) {
-        textEditing.selection =
-            TextSelection(baseOffset: 0, extentOffset: textEditing.text.length);
-      }
-    });
+    focus.addListener(
+      () {
+        if (focus.hasFocus) {
+          textEditing.selection = TextSelection(
+              baseOffset: 0, extentOffset: textEditing.text.length);
+        }
+      },
+    );
   }
 
   @override
   void initState() {
     super.initState();
 
-    initController();
+    _textControllerPorta = TextEditingController(text: '32211');
+    _textControllerTara = TextEditingController(text: '0.0');
+    _textControllerPesoOscilacao = TextEditingController(text: '0.0');
+    _textControllerMaxMinValue = TextEditingController(text: '99999.9');
+    _textControllerCasasDecimais = TextEditingController(text: '1');
+    _textControllerPeso = TextEditingController(text: '0.0');
+    _textControllerEndereco = TextEditingController(text: '');
+    _focusNodeTara = FocusNode();
+    _focusNodeOscilarPeso = FocusNode();
+    _focusNodeMinMaxValue = FocusNode();
+
+    uiController = HomeController(
+      textControllerCasasDecimais: _textControllerCasasDecimais,
+      textControllerMaxMinValue: _textControllerMaxMinValue,
+      textControllerPeso: _textControllerPeso,
+      textControllerPesoOscilacao: _textControllerPesoOscilacao,
+      textControllerPorta: _textControllerPorta,
+      textControllerTara: _textControllerTara,
+      textControllerEndereco: _textControllerEndereco,
+    );
+
+    balancaState = BalancaController(uiController);
     _addFocusNodeListener(_focusNodeTara, _textControllerTara);
     _addFocusNodeListener(_focusNodeOscilarPeso, _textControllerPesoOscilacao);
     _addFocusNodeListener(_focusNodeMinMaxValue, _textControllerMaxMinValue);
@@ -58,6 +81,7 @@ class _HomeState extends State<Home> {
   @override
   void dispose() {
     _textControllerPorta.dispose();
+    _textControllerEndereco.dispose();
     _textControllerTara.dispose();
     _textControllerPesoOscilacao.dispose();
     _textControllerMaxMinValue.dispose();
@@ -167,92 +191,95 @@ class _HomeState extends State<Home> {
 
   Widget _buildCardDadosPesagem() {
     return Card(
-        child: ListTile(
-      title: const Text('Dados Balança'),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: ValueListenableBuilder<int>(
-                    valueListenable: uiController.casasDecimais,
-                    builder: (context, valueCasasDecimais, child) {
-                      return TextFormFieldWidget(
-                        controller: _textControllerTara,
-                        focusNode: _focusNodeTara,
-                        title: 'Tara',
-                        textInputFormatter: [
-                          CurrencyInputFormatterFreeEdit(
-                              acceptNegative: false,
-                              decimalPrecision: valueCasasDecimais),
-                          MaxValueImputFormatter(999999, valueCasasDecimais),
-                        ],
-                      );
-                    },
+      child: ListTile(
+        title: const Text('Dados Balança'),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: ValueListenableBuilder<int>(
+                      valueListenable: uiController.casasDecimais,
+                      builder: (context, valueCasasDecimais, child) {
+                        return TextFormFieldWidget(
+                          controller: _textControllerTara,
+                          focusNode: _focusNodeTara,
+                          title: 'Tara',
+                          textInputFormatter: [
+                            CurrencyInputFormatterFreeEdit(
+                                acceptNegative: false,
+                                decimalPrecision: valueCasasDecimais),
+                            MaxValueImputFormatter(999999, valueCasasDecimais),
+                          ],
+                        );
+                      },
+                    ),
                   ),
-                ),
-                _getEspacoRow(),
-                Expanded(
-                  child: Row(
-                    children: [
-                      const Text("Oscilar Peso"),
-                      ValueListenableBuilder<bool>(
-                        valueListenable: uiController.oscilarPeso,
-                        builder: (context, valueOscilar, child) {
-                          return Switch(
-                            value: valueOscilar,
-                            activeColor: Theme.of(context).colorScheme.primary,
-                            onChanged: (value) {
-                              uiController.oscilarPeso.value = value;
-                            },
-                          );
-                        },
-                      ),
-                      Expanded(
-                        child: ValueListenableBuilder(
-                          valueListenable: uiController.minMaxValue,
-                          builder: (context, valueMinMax, child) {
-                            return ValueListenableBuilder(
-                              valueListenable: uiController.oscilarPeso,
-                              builder: (context, valueOscilarPeso, widget) {
-                                return ValueListenableBuilder<int>(
-                                  valueListenable: uiController.casasDecimais,
-                                  builder:
-                                      (context, valueCasasDecimais, child) {
-                                    return TextFormFieldWidget(
-                                      enabled: valueOscilarPeso,
-                                      focusNode: _focusNodeOscilarPeso,
-                                      controller: _textControllerPesoOscilacao,
-                                      title: 'Valor Oscilação',
-                                      textInputFormatter: [
-                                        CurrencyInputFormatterFreeEdit(
-                                            acceptNegative: false,
-                                            decimalPrecision:
-                                                valueCasasDecimais),
-                                        MaxValueImputFormatter(
-                                            valueMinMax, valueCasasDecimais),
-                                      ],
-                                    );
-                                  },
-                                );
+                  _getEspacoRow(),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Text("Oscilar Peso"),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: uiController.oscilarPeso,
+                          builder: (context, valueOscilar, child) {
+                            return Switch(
+                              value: valueOscilar,
+                              activeColor:
+                                  Theme.of(context).colorScheme.primary,
+                              onChanged: (value) {
+                                uiController.oscilarPeso.value = value;
                               },
                             );
                           },
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          child: ValueListenableBuilder(
+                            valueListenable: uiController.minMaxValue,
+                            builder: (context, valueMinMax, child) {
+                              return ValueListenableBuilder(
+                                valueListenable: uiController.oscilarPeso,
+                                builder: (context, valueOscilarPeso, widget) {
+                                  return ValueListenableBuilder<int>(
+                                    valueListenable: uiController.casasDecimais,
+                                    builder:
+                                        (context, valueCasasDecimais, child) {
+                                      return TextFormFieldWidget(
+                                        enabled: valueOscilarPeso,
+                                        focusNode: _focusNodeOscilarPeso,
+                                        controller:
+                                            _textControllerPesoOscilacao,
+                                        title: 'Valor Oscilação',
+                                        textInputFormatter: [
+                                          CurrencyInputFormatterFreeEdit(
+                                              acceptNegative: false,
+                                              decimalPrecision:
+                                                  valueCasasDecimais),
+                                          MaxValueImputFormatter(
+                                              valueMinMax, valueCasasDecimais),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            _getEspacoColumn(),
-            _buildSliderPeso(),
-          ],
+                ],
+              ),
+              _getEspacoColumn(),
+              _buildSliderPeso(),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   Widget _buildCardconfigs() {
@@ -266,6 +293,14 @@ class _HomeState extends State<Home> {
             builder: (context, state, child) {
               return Row(
                 children: [
+                  Expanded(
+                    child: TextFormFieldWidget(
+                      enabled: false,
+                      controller: _textControllerEndereco,
+                      title: 'Ip',
+                    ),
+                  ),
+                  _getEspacoRow(),
                   Expanded(
                     child: TextFormFieldWidget(
                       enabled: (state is! BalancaStateSucess),
@@ -422,44 +457,47 @@ class _HomeState extends State<Home> {
                 );
               },
             ),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              ElevatedButton(
-                onPressed: state is BalancaStateSucess
-                    ? () {
-                        if (uiController.pesoTela.value >
-                            -uiController.minMaxValue.value) {
-                          uiController.decrementarPeso(1);
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: state is BalancaStateSucess
+                      ? () {
+                          if (uiController.pesoTela.value >
+                              -uiController.minMaxValue.value) {
+                            uiController.decrementarPeso(1);
+                          }
                         }
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                  ),
+                  child: const Icon(Icons.exposure_minus_1),
                 ),
-                child: const Icon(Icons.exposure_minus_1),
-              ),
-              ElevatedButton(
-                onPressed: state is BalancaStateSucess
-                    ? () {
-                        uiController.pesoTela.value = 0;
-                      }
-                    : null,
-                child: const Text('Zerar Peso'),
-              ),
-              ElevatedButton(
-                onPressed: state is BalancaStateSucess
-                    ? () {
-                        if (uiController.pesoTela.value <
-                            uiController.minMaxValue.value) {
-                          uiController.incrementarPeso(1);
+                ElevatedButton(
+                  onPressed: state is BalancaStateSucess
+                      ? () {
+                          uiController.pesoTela.value = 0;
                         }
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
+                      : null,
+                  child: const Text('Zerar Peso'),
                 ),
-                child: const Icon(Icons.exposure_plus_1),
-              )
-            ])
+                ElevatedButton(
+                  onPressed: state is BalancaStateSucess
+                      ? () {
+                          if (uiController.pesoTela.value <
+                              uiController.minMaxValue.value) {
+                            uiController.incrementarPeso(1);
+                          }
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                  ),
+                  child: const Icon(Icons.exposure_plus_1),
+                )
+              ],
+            )
           ],
         );
       },
@@ -535,72 +573,5 @@ class _HomeState extends State<Home> {
       },
     );
     textControllerPeso.clear();
-  }
-
-  Future<void> _loadPreferencesValue() async {
-    var casasDecimaisAux = await SharedPreferencesHelper.instance
-        .loadInt(EnumKeysSharedPreferences.eCasasDecimais);
-    if (casasDecimaisAux != null) {
-      uiController.setCasasDecimais(casasDecimaisAux.toString());
-      _textControllerCasasDecimais.text = casasDecimaisAux.toString();
-    }
-
-    var minMaxAux = await SharedPreferencesHelper.instance
-        .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
-    if (minMaxAux != null) {
-      uiController.setMinMaxIntValue(minMaxAux);
-      _textControllerMaxMinValue.text = uiController.getValueDivisor(minMaxAux);
-    }
-  }
-
-  void initController() async {
-    balancaState = BalancaController(uiController);
-    //#region ListenerTextControllers
-    _textControllerTara.addListener(
-      () {
-        uiController.setTaraTelaValue(_textControllerTara.text);
-      },
-    );
-    _textControllerPesoOscilacao.addListener(
-      () {
-        uiController.setPesoOscilacao(_textControllerPesoOscilacao.text);
-      },
-    );
-    _textControllerMaxMinValue.addListener(
-      () {
-        uiController.setMinMaxValue(_textControllerMaxMinValue.text);
-      },
-    );
-    _textControllerCasasDecimais.addListener(
-      () {
-        uiController.setCasasDecimais(_textControllerCasasDecimais.text);
-      },
-    );
-
-    //#endregion
-    //#region ListenerUiController
-    uiController.casasDecimais.addListener(
-      () {
-        SharedPreferencesHelper.instance.saveInt(
-            EnumKeysSharedPreferences.eCasasDecimais,
-            uiController.casasDecimais.value);
-
-        _textControllerMaxMinValue.text =
-            uiController.getValueDivisor(uiController.minMaxValue.value);
-        _textControllerTara.text =
-            uiController.getValueDivisor(uiController.taraTela.value);
-        _textControllerPesoOscilacao.text =
-            uiController.getValueDivisor(uiController.pesoOscilacao.value);
-      },
-    );
-    uiController.minMaxValue.addListener(
-      () {
-        SharedPreferencesHelper.instance.saveInt(
-            EnumKeysSharedPreferences.ePesoMinMax,
-            uiController.minMaxValue.value);
-      },
-    );
-    // #endregion
-    await _loadPreferencesValue();
   }
 }

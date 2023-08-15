@@ -106,7 +106,7 @@ class TextFormFieldWidget extends StatelessWidget {
       onChanged: onChanged ?? (value) {},
       onTap: onTap ?? () {},
       style: TextStyle(
-        color: Theme.of(context).textTheme.caption?.color??Colors.black,
+        color: Theme.of(context).textTheme.bodySmall?.color??Colors.black,
         fontSize: 12.5,
       ),
     );
