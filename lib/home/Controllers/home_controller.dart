@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ class HomeController {
   ValueNotifier<bool> oscilarPeso = ValueNotifier(false);
   ValueNotifier<int> pesoOscilacao = ValueNotifier(0);
   ValueNotifier<int> taraTela = ValueNotifier(0);
+  ValueNotifier<String> endereco = ValueNotifier("");
 
   void incrementarPeso(int value) {
     pesoTela.value += value;
@@ -55,6 +57,11 @@ class HomeController {
     casasDecimais.value = int.tryParse(valueString) ?? 0;
   }
 
+  void setEnderecoIp(String ip){
+    print(ip);
+    endereco.value = ip;
+  }
+
   String getValueDivisor(int valorOriginal) {
     return (valorOriginal /
             (casasDecimais.value > 0 ? pow(10, casasDecimais.value) : 1))
@@ -68,4 +75,6 @@ class HomeController {
             .replaceAll(',', '')) ??
         0;
   }
+
+  
 }
