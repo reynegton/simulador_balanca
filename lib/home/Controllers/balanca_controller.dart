@@ -6,13 +6,8 @@ import 'package:flutter/foundation.dart';
 import '../States/balanca_state.dart';
 import 'home_controller.dart';
 
-
-
 class BalancaController extends ValueNotifier<BalancaState> {
   HomeController uiController;
-  /*int _pesoTela = 0;
-  String taraTela = "";*/
-
   ServerSocket? _serverSocket;
   late Timer _timer;
   List<String> _protocolos = [];
@@ -32,11 +27,10 @@ class BalancaController extends ValueNotifier<BalancaState> {
     value = BalancaStateDisconnect(protocolos: _protocolos);
   }
 
-  Future<void> createServer(int porta) async {
+  Future<void> _connect(InternetAddress address, int porta) async {
     try {
       value = BalancaStateLoading();
-      _serverSocket =
-          await ServerSocket.bind(InternetAddress.anyIPv4, porta, shared: true);
+      _serverSocket = await ServerSocket.bind(address, porta, shared: true);
       _serverSocket?.listen(
         _handleConnection,
       );
@@ -58,7 +52,19 @@ class BalancaController extends ValueNotifier<BalancaState> {
     } on Exception catch (e) {
       value = BalancaStateDisconnect(
           messageError: e.toString(), protocolos: _protocolos);
+      rethrow;
     }
+  }
+
+  Future<void> createServer(int porta) async {
+    var listaAddress = await getAddress();
+    for (var element in listaAddress) {
+      try{
+        await _connect(element, porta);
+        uiController.setEnderecoIp(element.address);
+      } on Exception catch (_) {
+      }
+     }
   }
 
   void _handleConnection(Socket client) {
@@ -109,10 +115,10 @@ class BalancaController extends ValueNotifier<BalancaState> {
           uiController.pesoTela.value - uiController.pesoOscilacao.value;
       var pesofim =
           uiController.pesoTela.value + uiController.pesoOscilacao.value;
-      if (pesofim > uiController.minMaxValue.value){
+      if (pesofim > uiController.minMaxValue.value) {
         pesofim = uiController.minMaxValue.value;
       }
-      if (pesoini < -uiController.minMaxValue.value){
+      if (pesoini < -uiController.minMaxValue.value) {
         pesoini = -uiController.minMaxValue.value;
       }
       var diferenca = (pesofim - pesoini).abs();
@@ -131,5 +137,17 @@ class BalancaController extends ValueNotifier<BalancaState> {
     var protocolo =
         "${String.fromCharCode(2)}+${peso >= 0 ? 'p' : 's'}`${pesoStr.padLeft(6, '0')}${taraStr.padLeft(6, '0')}${String.fromCharCode(13)}";
     return protocolo;
+  }
+
+  Future<List<InternetAddress>> getAddress() async {
+    var enderecos = <InternetAddress>[];
+    for (var interface in await NetworkInterface.list()) {
+      for (var addr in interface.addresses) {
+        if (addr.type == InternetAddressType.IPv4) {
+          enderecos.add(addr);
+        }
+      }
+    }
+    return enderecos;
   }
 }
