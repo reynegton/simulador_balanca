@@ -62,6 +62,7 @@ class BalancaController extends ValueNotifier<BalancaState> {
       try{
         await _connect(element, porta);
         uiController.setEnderecoIp(element.address);
+        break;
       } on Exception catch (_) {
       }
      }
