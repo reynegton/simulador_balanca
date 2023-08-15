@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../Utils/shared_preferences_helper.dart';
+
 class HomeController {
   ValueNotifier<int> minMaxValue = ValueNotifier(999999);
   ValueNotifier<int> casasDecimais = ValueNotifier(1);
@@ -9,6 +11,27 @@ class HomeController {
   ValueNotifier<bool> oscilarPeso = ValueNotifier(false);
   ValueNotifier<int> pesoOscilacao = ValueNotifier(0);
   ValueNotifier<int> taraTela = ValueNotifier(0);
+  ValueNotifier<String> endereco = ValueNotifier("");
+
+  final TextEditingController textControllerPorta;
+  final TextEditingController textControllerTara;
+  final TextEditingController textControllerPesoOscilacao;
+  final TextEditingController textControllerEndereco;
+  final TextEditingController textControllerMaxMinValue;
+  final TextEditingController textControllerCasasDecimais;
+  final TextEditingController textControllerPeso;
+
+  HomeController(
+      {required this.textControllerPorta,
+      required this.textControllerCasasDecimais,
+      required this.textControllerMaxMinValue,
+      required this.textControllerPeso,
+      required this.textControllerPesoOscilacao,
+      required this.textControllerTara,
+      required this.textControllerEndereco}) {
+    _addListeners();
+    _loadPreferencesValue();
+  }
 
   void incrementarPeso(int value) {
     pesoTela.value += value;
@@ -39,6 +62,7 @@ class HomeController {
     }
     minMaxValue.value = minMax;
   }
+
   void setMinMaxIntValue(int value) {
     var minMax = value;
     minMaxValue.value = minMax;
@@ -55,6 +79,11 @@ class HomeController {
     casasDecimais.value = int.tryParse(valueString) ?? 0;
   }
 
+  void setEnderecoIp(String ip) {
+    print(ip);
+    endereco.value = ip;
+  }
+
   String getValueDivisor(int valorOriginal) {
     return (valorOriginal /
             (casasDecimais.value > 0 ? pow(10, casasDecimais.value) : 1))
@@ -67,5 +96,66 @@ class HomeController {
             .replaceAll('.', '')
             .replaceAll(',', '')) ??
         0;
+  }
+
+  void _addListeners() {
+    textControllerTara.addListener(
+      () {
+        setTaraTelaValue(textControllerTara.text);
+      },
+    );
+    textControllerPesoOscilacao.addListener(
+      () {
+        setPesoOscilacao(textControllerPesoOscilacao.text);
+      },
+    );
+    textControllerMaxMinValue.addListener(
+      () {
+        setMinMaxValue(textControllerMaxMinValue.text);
+      },
+    );
+    textControllerCasasDecimais.addListener(
+      () {
+        setCasasDecimais(textControllerCasasDecimais.text);
+      },
+    );
+
+    casasDecimais.addListener(
+      () {
+        SharedPreferencesHelper.instance.saveInt(
+            EnumKeysSharedPreferences.eCasasDecimais, casasDecimais.value);
+
+        textControllerMaxMinValue.text = getValueDivisor(minMaxValue.value);
+        textControllerTara.text = getValueDivisor(taraTela.value);
+        textControllerPesoOscilacao.text = getValueDivisor(pesoOscilacao.value);
+      },
+    );
+    minMaxValue.addListener(
+      () {
+        SharedPreferencesHelper.instance
+            .saveInt(EnumKeysSharedPreferences.ePesoMinMax, minMaxValue.value);
+      },
+    );
+    endereco.addListener(
+      () {
+        textControllerEndereco.text = endereco.value;
+      },
+    );
+  }
+
+  Future<void> _loadPreferencesValue() async {
+    var casasDecimaisAux = await SharedPreferencesHelper.instance
+        .loadInt(EnumKeysSharedPreferences.eCasasDecimais);
+    if (casasDecimaisAux != null) {
+      setCasasDecimais(casasDecimaisAux.toString());
+      textControllerCasasDecimais.text = casasDecimaisAux.toString();
+    }
+
+    var minMaxAux = await SharedPreferencesHelper.instance
+        .loadInt(EnumKeysSharedPreferences.ePesoMinMax);
+    if (minMaxAux != null) {
+      setMinMaxIntValue(minMaxAux);
+      textControllerMaxMinValue.text = getValueDivisor(minMaxAux);
+    }
   }
 }
