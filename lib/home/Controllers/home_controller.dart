@@ -11,22 +11,24 @@ class HomeController {
   ValueNotifier<bool> oscilarPeso = ValueNotifier(false);
   ValueNotifier<int> pesoOscilacao = ValueNotifier(0);
   ValueNotifier<int> taraTela = ValueNotifier(0);
+  ValueNotifier<String> endereco = ValueNotifier("");
 
   final TextEditingController textControllerPorta;
   final TextEditingController textControllerTara;
   final TextEditingController textControllerPesoOscilacao;
+  final TextEditingController textControllerEndereco;
   final TextEditingController textControllerMaxMinValue;
   final TextEditingController textControllerCasasDecimais;
   final TextEditingController textControllerPeso;
 
-  HomeController({
-    required this.textControllerPorta,
-    required this.textControllerCasasDecimais,
-    required this.textControllerMaxMinValue,
-    required this.textControllerPeso,
-    required this.textControllerPesoOscilacao,
-    required this.textControllerTara,
-  }) {
+  HomeController(
+      {required this.textControllerPorta,
+      required this.textControllerCasasDecimais,
+      required this.textControllerMaxMinValue,
+      required this.textControllerPeso,
+      required this.textControllerPesoOscilacao,
+      required this.textControllerTara,
+      required this.textControllerEndereco}) {
     _addListeners();
     _loadPreferencesValue();
   }
@@ -75,6 +77,11 @@ class HomeController {
 
   void setCasasDecimais(String valueString) {
     casasDecimais.value = int.tryParse(valueString) ?? 0;
+  }
+
+  void setEnderecoIp(String ip) {
+    print(ip);
+    endereco.value = ip;
   }
 
   String getValueDivisor(int valorOriginal) {
@@ -127,6 +134,11 @@ class HomeController {
       () {
         SharedPreferencesHelper.instance
             .saveInt(EnumKeysSharedPreferences.ePesoMinMax, minMaxValue.value);
+      },
+    );
+    endereco.addListener(
+      () {
+        textControllerEndereco.text = endereco.value;
       },
     );
   }
