@@ -302,6 +302,7 @@ class _AdwButtonState extends State<AdwButton> {
           child: AnimatedContainer(
             padding: widget.padding,
             constraints: widget.constraints,
+            alignment: Alignment.center,
             duration: widget.animationDuration,
             curve: widget.animationCurve,
             decoration: BoxDecoration(
