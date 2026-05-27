@@ -1,11 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum EnumKeysSharedPreferences {
-  ePesoMinMax,
-  eCasasDecimais,
-  eThemeMode
-}
+enum EnumKeysSharedPreferences { ePesoMinMax, eCasasDecimais, eThemeMode }
 
 class SharedPreferencesHelper {
   static final SharedPreferencesHelper _preferencesHelper =
@@ -98,7 +94,7 @@ class SharedPreferencesHelper {
   }
 
   // #endregion
-  
+
   // #region StringList
   Future<bool> saveStringList(
       EnumKeysSharedPreferences nameKey, List<String> value) async {
@@ -117,7 +113,7 @@ class SharedPreferencesHelper {
   }
 
   // #endregion
-  
+
   // #region Boolean
   Future<bool> saveBool(EnumKeysSharedPreferences nameKey, bool value) async {
     try {
@@ -137,7 +133,7 @@ class SharedPreferencesHelper {
   }
 
   // #endregion
-  
+
   // #region Integer
   Future<bool> saveInt(EnumKeysSharedPreferences nameKey, int value) async {
     try {
@@ -157,7 +153,7 @@ class SharedPreferencesHelper {
   }
 
   // #endregion
-  
+
   // #region Double
   Future<bool> saveDouble(
       EnumKeysSharedPreferences nameKey, double value) async {

@@ -13,25 +13,25 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return EasySplashScreen(
-      logo: Image.asset(
-          'assets/balanca.png'),
+      logo: Image.asset('assets/balanca.png'),
       title: Text(
         "Simulador de Balança",
-        style: TextStyle(
-          color: Colors.white70,
-          fontSize: 18,
+        style: theme.textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
         ),
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: theme.scaffoldBackgroundColor,
       showLoader: true,
-      loaderColor: Colors.white70,
-      loadingText: const Text("Carregando Dados...",style: TextStyle(
-          color: Colors.white70,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),),
+      loaderColor: theme.colorScheme.primary,
+      loadingText: Text(
+        "Carregando Dados...",
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+        ),
+      ),
       navigator: const HomePage(),
       durationInSeconds: 3,
     );

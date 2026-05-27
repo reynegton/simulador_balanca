@@ -27,7 +27,8 @@ class TextFormFieldWidget extends StatelessWidget {
   final bool enableInteractiveSelection;
   final VoidCallback? onTap;
 
-  const TextFormFieldWidget({super.key, 
+  const TextFormFieldWidget({
+    super.key,
     required this.controller,
     this.initialValue,
     required this.title,
@@ -52,8 +53,7 @@ class TextFormFieldWidget extends StatelessWidget {
     this.enableInteractiveSelection = true,
     this.autovalidate = false,
     this.onTap,
-
-  }) ;
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +106,7 @@ class TextFormFieldWidget extends StatelessWidget {
       onChanged: onChanged ?? (value) {},
       onTap: onTap ?? () {},
       style: TextStyle(
-        color: Theme.of(context).textTheme.bodySmall?.color??Colors.black,
+        color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.black,
         fontSize: 12.5,
       ),
     );

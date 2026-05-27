@@ -12,11 +12,11 @@ class ScaleBackendBloc extends Bloc<ScaleBackendEvent, ScaleBackendState> {
 
   Timer? _timer;
   StreamSubscription? _historySub;
-  
+
   String _currentIp = "";
   int _currentPort = 0;
   List<String> _currentHistory = [];
-  
+
   int _latestPeso = 0;
   int _latestTara = 0;
 
@@ -35,7 +35,8 @@ class ScaleBackendBloc extends Bloc<ScaleBackendEvent, ScaleBackendState> {
     });
   }
 
-  Future<void> _onStartServer(StartServerEvent event, Emitter<ScaleBackendState> emit) async {
+  Future<void> _onStartServer(
+      StartServerEvent event, Emitter<ScaleBackendState> emit) async {
     emit(ScaleBackendLoading());
     try {
       _currentPort = event.port;
@@ -45,8 +46,8 @@ class ScaleBackendBloc extends Bloc<ScaleBackendEvent, ScaleBackendState> {
       _timer?.cancel();
       _timer = Timer.periodic(const Duration(milliseconds: 300), (_) {
         if (!isClosed) {
-           var message = protocolStrategy.formatWeight(_latestPeso, _latestTara);
-           repository.broadcastMessage(message);
+          var message = protocolStrategy.formatWeight(_latestPeso, _latestTara);
+          repository.broadcastMessage(message);
         }
       });
     } catch (e) {
@@ -54,16 +55,19 @@ class ScaleBackendBloc extends Bloc<ScaleBackendEvent, ScaleBackendState> {
     }
   }
 
-  Future<void> _onStopServer(StopServerEvent event, Emitter<ScaleBackendState> emit) async {
+  Future<void> _onStopServer(
+      StopServerEvent event, Emitter<ScaleBackendState> emit) async {
     _timer?.cancel();
     await repository.stopServer();
     emit(ScaleBackendInitial());
   }
 
-  void _onUpdateHistory(UpdateHistoryEvent event, Emitter<ScaleBackendState> emit) {
+  void _onUpdateHistory(
+      UpdateHistoryEvent event, Emitter<ScaleBackendState> emit) {
     if (state is ScaleBackendRunning) {
       _currentHistory = event.history;
-      emit(ScaleBackendRunning(_currentIp, _currentPort, List.from(event.history)));
+      emit(ScaleBackendRunning(
+          _currentIp, _currentPort, List.from(event.history)));
     }
   }
 

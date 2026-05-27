@@ -11,7 +11,8 @@ class ConfigBloc extends Bloc<ConfigEvent, ConfigState> {
     on<UpdateConfigEvent>(_onUpdateConfig);
   }
 
-  Future<void> _onLoadConfig(LoadConfigEvent event, Emitter<ConfigState> emit) async {
+  Future<void> _onLoadConfig(
+      LoadConfigEvent event, Emitter<ConfigState> emit) async {
     emit(ConfigLoading());
     try {
       final config = await repository.loadConfig();
@@ -21,7 +22,8 @@ class ConfigBloc extends Bloc<ConfigEvent, ConfigState> {
     }
   }
 
-  Future<void> _onUpdateConfig(UpdateConfigEvent event, Emitter<ConfigState> emit) async {
+  Future<void> _onUpdateConfig(
+      UpdateConfigEvent event, Emitter<ConfigState> emit) async {
     try {
       await repository.saveConfig(event.config);
       emit(ConfigLoaded(event.config));

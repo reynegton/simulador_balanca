@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:libadwaita/libadwaita.dart';
 import '../../domain/entities/scale_config.dart';
 import '../bloc/weight_bloc/weight_bloc.dart';
 import '../bloc/weight_bloc/weight_event.dart';
@@ -49,7 +50,10 @@ class _WeightPanelState extends State<WeightPanel> {
   }
 
   String _formatValue(int value) {
-    return (value / (widget.config.casasDecimais > 0 ? pow(10, widget.config.casasDecimais) : 1))
+    return (value /
+            (widget.config.casasDecimais > 0
+                ? pow(10, widget.config.casasDecimais)
+                : 1))
         .toStringAsFixed(widget.config.casasDecimais);
   }
 
@@ -57,36 +61,55 @@ class _WeightPanelState extends State<WeightPanel> {
     if (text.isEmpty) return 0;
     final cleanText = text.replaceAll(',', '.');
     final doubleValue = double.tryParse(cleanText) ?? 0.0;
-    return (doubleValue * (widget.config.casasDecimais > 0 ? pow(10, widget.config.casasDecimais) : 1)).round();
+    return (doubleValue *
+            (widget.config.casasDecimais > 0
+                ? pow(10, widget.config.casasDecimais)
+                : 1))
+        .round();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<WeightBloc, WeightState>(
       builder: (context, state) {
+        final theme = Theme.of(context);
         return Card(
-          elevation: 4,
+          color: theme.cardColor,
+          elevation: 0,
           margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: theme.dividerColor.withValues(alpha: 0.08),
+            ),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Simulação de Peso", style: Theme.of(context).textTheme.titleLarge),
+                Text("Simulação de Peso",
+                    style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
                       child: TextField(
                         controller: _pesoCtrl,
-                        decoration: const InputDecoration(labelText: 'Peso Base'),
+                        decoration:
+                            const InputDecoration(labelText: 'Peso Base'),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          CurrencyInputFormatterFreeEdit(acceptNegative: true, decimalPrecision: widget.config.casasDecimais),
-                          MaxValueImputFormatter(widget.config.minMaxValue, widget.config.casasDecimais),
+                          CurrencyInputFormatterFreeEdit(
+                              acceptNegative: true,
+                              decimalPrecision: widget.config.casasDecimais),
+                          MaxValueImputFormatter(widget.config.minMaxValue,
+                              widget.config.casasDecimais),
                         ],
                         onChanged: (val) {
-                          context.read<WeightBloc>().add(SetManualWeightEvent(_parseValue(val)));
+                          context
+                              .read<WeightBloc>()
+                              .add(SetManualWeightEvent(_parseValue(val)));
                         },
                       ),
                     ),
@@ -97,11 +120,16 @@ class _WeightPanelState extends State<WeightPanel> {
                         decoration: const InputDecoration(labelText: 'Tara'),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          CurrencyInputFormatterFreeEdit(acceptNegative: false, decimalPrecision: widget.config.casasDecimais),
-                          MaxValueImputFormatter(widget.config.minMaxValue, widget.config.casasDecimais),
+                          CurrencyInputFormatterFreeEdit(
+                              acceptNegative: false,
+                              decimalPrecision: widget.config.casasDecimais),
+                          MaxValueImputFormatter(widget.config.minMaxValue,
+                              widget.config.casasDecimais),
                         ],
                         onChanged: (val) {
-                           context.read<WeightBloc>().add(SetTareEvent(_parseValue(val)));
+                          context
+                              .read<WeightBloc>()
+                              .add(SetTareEvent(_parseValue(val)));
                         },
                       ),
                     ),
@@ -120,7 +148,9 @@ class _WeightPanelState extends State<WeightPanel> {
                         min: -(widget.config.minMaxValue.toDouble()),
                         max: widget.config.minMaxValue.toDouble(),
                         onChanged: (val) {
-                          context.read<WeightBloc>().add(SetManualWeightEvent(val.toInt()));
+                          context
+                              .read<WeightBloc>()
+                              .add(SetManualWeightEvent(val.toInt()));
                           _pesoCtrl.text = _formatValue(val.toInt());
                         },
                       ),
@@ -131,70 +161,87 @@ class _WeightPanelState extends State<WeightPanel> {
                 Row(
                   children: [
                     const Text("Oscilar Peso"),
-                    Switch(
+                    const SizedBox(width: 16),
+                    AdwSwitch(
                       value: state.isOscillating,
                       onChanged: (val) {
                         final variance = _parseValue(_oscilacaoCtrl.text);
-                        context.read<WeightBloc>().add(ToggleOscillationEvent(val, variance, widget.config.minMaxValue));
+                        context.read<WeightBloc>().add(ToggleOscillationEvent(
+                            val, variance, widget.config.minMaxValue));
                       },
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: TextField(
                         controller: _oscilacaoCtrl,
-                        decoration: const InputDecoration(labelText: 'Variância de Oscilação (+/-)'),
+                        decoration: const InputDecoration(
+                            labelText: 'Variância de Oscilação (+/-)'),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          CurrencyInputFormatterFreeEdit(acceptNegative: false, decimalPrecision: widget.config.casasDecimais),
-                          MaxValueImputFormatter(widget.config.minMaxValue, widget.config.casasDecimais),
+                          CurrencyInputFormatterFreeEdit(
+                              acceptNegative: false,
+                              decimalPrecision: widget.config.casasDecimais),
+                          MaxValueImputFormatter(widget.config.minMaxValue,
+                              widget.config.casasDecimais),
                         ],
                         onChanged: (val) {
                           if (state.isOscillating) {
                             final variance = _parseValue(val);
-                            context.read<WeightBloc>().add(ToggleOscillationEvent(true, variance, widget.config.minMaxValue));
+                            context.read<WeightBloc>().add(
+                                ToggleOscillationEvent(
+                                    true, variance, widget.config.minMaxValue));
                           }
                         },
                       ),
                     ),
                     const SizedBox(width: 16),
-                    Builder(
-                      builder: (context) {
-                        final displayColor = Theme.of(context).colorScheme.primary;
-                        final displayTextColor = displayColor.computeLuminance() > 0.5 ? Colors.black : Colors.white;
-                        
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: displayColor,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.monitor_weight, color: displayTextColor),
-                              const SizedBox(width: 8),
-                          Stack(
-                            alignment: Alignment.centerRight,
-                            children: [
-                              Text(
-                                _formatValue(widget.config.minMaxValue),
-                                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                  color: Colors.transparent,
+                    Builder(builder: (context) {
+                      final displayColor =
+                          Theme.of(context).colorScheme.primary;
+                      final displayTextColor =
+                          displayColor.computeLuminance() > 0.5
+                              ? Colors.black
+                              : Colors.white;
+
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: displayColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.monitor_weight, color: displayTextColor),
+                            const SizedBox(width: 8),
+                            Stack(
+                              alignment: Alignment.centerRight,
+                              children: [
+                                Text(
+                                  _formatValue(widget.config.minMaxValue),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displaySmall
+                                      ?.copyWith(
+                                        color: Colors.transparent,
+                                      ),
                                 ),
-                              ),
-                                  Text(
-                                    _formatValue(state.peso),
-                                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                      color: displayTextColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                    ),
+                                Text(
+                                  _formatValue(state.peso),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displaySmall
+                                      ?.copyWith(
+                                        color: displayTextColor,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                   ],
                 )
               ],

@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 
 class CurrencyInputFormatter extends TextInputFormatter {
   int casasDecimais;
-  CurrencyInputFormatter([this.casasDecimais = 2, ]);
+  CurrencyInputFormatter([
+    this.casasDecimais = 2,
+  ]);
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {

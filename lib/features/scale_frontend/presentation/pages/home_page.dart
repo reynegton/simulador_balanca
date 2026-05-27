@@ -12,6 +12,7 @@ import '../../../../widgets/my_drawer_menu.dart';
 import '../widgets/config_panel.dart';
 import '../widgets/weight_panel.dart';
 import '../widgets/log_panel.dart';
+import 'package:libadwaita/libadwaita.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,6 +22,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final FlapController _flapController = FlapController()..isOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -29,61 +33,42 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const MyDrawerMenu(),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          WindowTitleBarBox(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).appBarTheme.backgroundColor,
-                border: Border(
-                  bottom: BorderSide(
-                    color: Theme.of(context).colorScheme.outline,
-                    width: 1,
-                  ),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Builder(
-                    builder: (context) => IconButton(
-                      icon: const Icon(Icons.menu, size: 20),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      onPressed: () => Scaffold.of(context).openDrawer(),
-                      tooltip: 'Menu',
-                    ),
-                  ),
-                  Expanded(
-                    child: MoveWindow(
-                      child: Center(
-                        child: Text(
-                          'Simulador Balança',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      MinimizeWindowButton(colors: _getWindowButtonColors(context)),
-                      MaximizeWindowButton(colors: _getWindowButtonColors(context)),
-                      CloseWindowButton(colors: _getCloseButtonColors(context)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: BlocListener<WeightBloc, WeightState>(
-              listenWhen: (previous, current) => previous.peso != current.peso || previous.tara != current.tara,
-              listener: (context, state) {
-                context.read<ScaleBackendBloc>().add(EmitWeightEvent(state.peso, state.tara));
-              },
-              child: BlocBuilder<ConfigBloc, ConfigState>(
-                builder: (context, state) {
+    return AdwScaffold(
+      scaffoldKey: _scaffoldKey,
+      flapController: _flapController,
+      flapOptions: const FlapOptions(
+        foldPolicy: FoldPolicy.always,
+      ),
+      title: Text(
+        'Simulador Balança',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      actions: AdwActions(
+        onClose: () => appWindow.close(),
+        onMaximize: () => appWindow.maximizeOrRestore(),
+        onMinimize: () => appWindow.minimize(),
+        onHeaderDrag: () => appWindow.startDragging(),
+        onDoubleTap: () => appWindow.maximizeOrRestore(),
+      ),
+      start: [
+        IconButton(
+          icon: const Icon(Icons.menu, size: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          onPressed: () => _flapController.toggle(),
+          tooltip: 'Menu',
+        ),
+      ],
+      flap: (isDrawer) => const MyDrawerMenu(),
+      body: BlocListener<WeightBloc, WeightState>(
+        listenWhen: (previous, current) =>
+            previous.peso != current.peso || previous.tara != current.tara,
+        listener: (context, state) {
+          context
+              .read<ScaleBackendBloc>()
+              .add(EmitWeightEvent(state.peso, state.tara));
+        },
+        child: BlocBuilder<ConfigBloc, ConfigState>(
+          builder: (context, state) {
             if (state is ConfigLoading || state is ConfigInitial) {
               return const Center(child: CircularProgressIndicator());
             }
@@ -118,12 +103,12 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         const Expanded(
-                          flex: 2, 
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
-                            child: LogPanel(),
-                          )
-                        ),
+                            flex: 2,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  top: 16.0, bottom: 16.0, right: 16.0),
+                              child: LogPanel(),
+                            )),
                       ],
                     );
                   } else {
@@ -145,33 +130,10 @@ class _HomePageState extends State<HomePage> {
                 },
               );
             }
-                return const SizedBox();
-              },
-            ),
-          ),
+            return const SizedBox();
+          },
         ),
-        ],
       ),
-    );
-  }
-
-  WindowButtonColors _getWindowButtonColors(BuildContext context) {
-    return WindowButtonColors(
-      iconNormal: Theme.of(context).colorScheme.onSurface,
-      mouseOver: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
-      mouseDown: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
-      iconMouseOver: Theme.of(context).colorScheme.onSurface,
-      iconMouseDown: Theme.of(context).colorScheme.onSurface,
-    );
-  }
-
-  WindowButtonColors _getCloseButtonColors(BuildContext context) {
-    return WindowButtonColors(
-      iconNormal: Theme.of(context).colorScheme.onSurface,
-      mouseOver: const Color(0xFFD32F2F),
-      mouseDown: const Color(0xFFB71C1C),
-      iconMouseOver: Colors.white,
-      iconMouseDown: Colors.white,
     );
   }
 }

@@ -9,12 +9,16 @@ class ScaleConfigRepositoryImpl implements ScaleConfigRepository {
 
   @override
   Future<ScaleConfig> loadConfig() async {
-    final casasDecimais = await prefsHelper.loadInt(EnumKeysSharedPreferences.eCasasDecimais) ?? 1;
-    final minMax = await prefsHelper.loadInt(EnumKeysSharedPreferences.ePesoMinMax) ?? 999999;
-    
-    // We didn't persist port originally, so we default to 9090
+    final casasDecimais =
+        await prefsHelper.loadInt(EnumKeysSharedPreferences.eCasasDecimais) ??
+            1;
+    final minMax =
+        await prefsHelper.loadInt(EnumKeysSharedPreferences.ePesoMinMax) ??
+            999999;
+
+    // We didn't persist port originally, so we default to 32211
     return ScaleConfig(
-      port: 9090, 
+      port: 32211,
       minMaxValue: minMax,
       casasDecimais: casasDecimais,
     );
@@ -22,7 +26,9 @@ class ScaleConfigRepositoryImpl implements ScaleConfigRepository {
 
   @override
   Future<void> saveConfig(ScaleConfig config) async {
-    await prefsHelper.saveInt(EnumKeysSharedPreferences.eCasasDecimais, config.casasDecimais);
-    await prefsHelper.saveInt(EnumKeysSharedPreferences.ePesoMinMax, config.minMaxValue);
+    await prefsHelper.saveInt(
+        EnumKeysSharedPreferences.eCasasDecimais, config.casasDecimais);
+    await prefsHelper.saveInt(
+        EnumKeysSharedPreferences.ePesoMinMax, config.minMaxValue);
   }
 }

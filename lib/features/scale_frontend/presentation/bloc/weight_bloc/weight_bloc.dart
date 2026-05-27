@@ -15,7 +15,8 @@ class WeightBloc extends Bloc<WeightEvent, WeightState> {
     on<TickOscillationEvent>(_onTickOscillation);
   }
 
-  void _onSetManualWeight(SetManualWeightEvent event, Emitter<WeightState> emit) {
+  void _onSetManualWeight(
+      SetManualWeightEvent event, Emitter<WeightState> emit) {
     emit(state.copyWith(basePeso: event.peso, peso: event.peso));
   }
 
@@ -23,13 +24,16 @@ class WeightBloc extends Bloc<WeightEvent, WeightState> {
     emit(state.copyWith(tara: event.tara));
   }
 
-  void _onToggleOscillation(ToggleOscillationEvent event, Emitter<WeightState> emit) {
+  void _onToggleOscillation(
+      ToggleOscillationEvent event, Emitter<WeightState> emit) {
     _currentMinMax = event.minMax;
-    emit(state.copyWith(isOscillating: event.isOscillating, variance: event.variance));
-    
+    emit(state.copyWith(
+        isOscillating: event.isOscillating, variance: event.variance));
+
     if (event.isOscillating) {
       _oscillationTimer?.cancel();
-      _oscillationTimer = Timer.periodic(const Duration(milliseconds: 300), (_) {
+      _oscillationTimer =
+          Timer.periodic(const Duration(milliseconds: 300), (_) {
         add(TickOscillationEvent());
       });
     } else {
@@ -37,7 +41,8 @@ class WeightBloc extends Bloc<WeightEvent, WeightState> {
     }
   }
 
-  void _onTickOscillation(TickOscillationEvent event, Emitter<WeightState> emit) {
+  void _onTickOscillation(
+      TickOscillationEvent event, Emitter<WeightState> emit) {
     if (!state.isOscillating) return;
 
     var pesoini = state.basePeso - state.variance;

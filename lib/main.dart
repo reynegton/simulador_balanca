@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 
-import 'core/theme/adwaita_theme.dart';
+import 'package:libadwaita/libadwaita.dart';
 
 import 'splash_page.dart';
 import 'theme_manager.dart';
@@ -44,7 +44,9 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (_) => ScaleServerRepositoryImpl()),
-        RepositoryProvider(create: (_) => ScaleConfigRepositoryImpl(SharedPreferencesHelper.instance)),
+        RepositoryProvider(
+            create: (_) =>
+                ScaleConfigRepositoryImpl(SharedPreferencesHelper.instance)),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -66,8 +68,10 @@ class MyApp extends StatelessWidget {
         child: Consumer<ThemeNotifier>(
           builder: (context, theme, child) => DynamicColorBuilder(
             builder: (lightDynamic, darkDynamic) {
-              ThemeData lightTheme = AdwaitaTheme.getLight(primaryColor: lightDynamic?.primary);
-              ThemeData darkTheme = AdwaitaTheme.getDark(primaryColor: darkDynamic?.primary);
+              ThemeData lightTheme =
+                  AdwaitaThemeData.light(accentColor: lightDynamic?.primary);
+              ThemeData darkTheme =
+                  AdwaitaThemeData.dark(accentColor: darkDynamic?.primary);
 
               return MaterialApp(
                 debugShowCheckedModeBanner: kDebugMode,

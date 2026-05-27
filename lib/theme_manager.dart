@@ -45,7 +45,7 @@ class ThemeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get boDarkMode{
+  bool get boDarkMode {
     return _themeData.brightness == Brightness.dark;
   }
 }

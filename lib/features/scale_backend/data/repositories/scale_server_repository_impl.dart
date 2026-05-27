@@ -7,7 +7,7 @@ class ScaleServerRepositoryImpl implements ScaleServerRepository {
   ServerSocket? _serverSocket;
   final List<Socket> _sockets = [];
   List<String> _history = [];
-  
+
   final _historyController = StreamController<List<String>>.broadcast();
 
   @override
@@ -16,19 +16,28 @@ class ScaleServerRepositoryImpl implements ScaleServerRepository {
   @override
   Future<String> startServer(int port) async {
     try {
-      _serverSocket = await ServerSocket.bind(InternetAddress.anyIPv4, port, shared: true);
+      _serverSocket =
+          await ServerSocket.bind(InternetAddress.anyIPv4, port, shared: true);
       _serverSocket!.listen(_handleConnection);
 
       // Try to find the best non-loopback IPv4 to display
       var interfaces = await NetworkInterface.list();
-      
+
       // Sort interfaces to prioritize physical adapters (deprioritize VPNs, WSL, VirtualBox, etc.)
       interfaces.sort((a, b) {
         final aName = a.name.toLowerCase();
         final bName = b.name.toLowerCase();
-        final aIsVirtual = aName.contains('virtual') || aName.contains('vethernet') || aName.contains('wsl') || aName.contains('vmware') || aName.contains('pseudo');
-        final bIsVirtual = bName.contains('virtual') || bName.contains('vethernet') || bName.contains('wsl') || bName.contains('vmware') || bName.contains('pseudo');
-        
+        final aIsVirtual = aName.contains('virtual') ||
+            aName.contains('vethernet') ||
+            aName.contains('wsl') ||
+            aName.contains('vmware') ||
+            aName.contains('pseudo');
+        final bIsVirtual = bName.contains('virtual') ||
+            bName.contains('vethernet') ||
+            bName.contains('wsl') ||
+            bName.contains('vmware') ||
+            bName.contains('pseudo');
+
         if (aIsVirtual && !bIsVirtual) return 1;
         if (!aIsVirtual && bIsVirtual) return -1;
         return 0;
@@ -37,14 +46,16 @@ class ScaleServerRepositoryImpl implements ScaleServerRepository {
       String bestIp = '0.0.0.0';
       for (var interface in interfaces) {
         for (var addr in interface.addresses) {
-          if (addr.type == InternetAddressType.IPv4 && !addr.isLoopback && !addr.isLinkLocal) {
+          if (addr.type == InternetAddressType.IPv4 &&
+              !addr.isLoopback &&
+              !addr.isLinkLocal) {
             bestIp = addr.address;
             break;
           }
         }
         if (bestIp != '0.0.0.0') break;
       }
-      
+
       return bestIp;
     } catch (e) {
       throw Exception("Could not start server on port $port: $e");
@@ -90,7 +101,8 @@ class ScaleServerRepositoryImpl implements ScaleServerRepository {
       _sockets.add(client);
     }
     if (kDebugMode) {
-      print('Connection from ${client.remoteAddress.address}:${client.remotePort}');
+      print(
+          'Connection from ${client.remoteAddress.address}:${client.remotePort}');
     }
     client.listen(
       (data) {
