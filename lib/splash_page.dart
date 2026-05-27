@@ -1,13 +1,13 @@
 import 'package:easy_splash_screen/easy_splash_screen.dart';
 import 'package:flutter/material.dart';
 
-import 'home/UI/home_screen.dart';
+import 'features/scale_frontend/presentation/pages/home_page.dart';
 
 class SplashPage extends StatefulWidget {
-  SplashPage({Key? key}) : super(key: key);
+  const SplashPage({super.key});
 
   @override
-  _SplashPageState createState() => _SplashPageState();
+  State<SplashPage> createState() => _SplashPageState();
 }
 
 class _SplashPageState extends State<SplashPage> {
@@ -27,12 +27,12 @@ class _SplashPageState extends State<SplashPage> {
       backgroundColor: Colors.black,
       showLoader: true,
       loaderColor: Colors.white70,
-      loadingText: Text("Carregando Dados...",style: TextStyle(
+      loadingText: const Text("Carregando Dados...",style: TextStyle(
           color: Colors.white70,
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),),
-      navigator: Home(),
+      navigator: const HomePage(),
       durationInSeconds: 3,
     );
   }

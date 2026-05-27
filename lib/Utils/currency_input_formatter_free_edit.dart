@@ -4,6 +4,7 @@ class CurrencyInputFormatterFreeEdit extends TextInputFormatter {
   CurrencyInputFormatterFreeEdit({this.acceptNegative = false, this.decimalPrecision });
   bool acceptNegative;
   int? decimalPrecision;
+  @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) { 
     if (newValue.selection.baseOffset == 0) {
