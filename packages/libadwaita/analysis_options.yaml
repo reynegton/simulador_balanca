@@ -1,0 +1,22 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  errors:
+    deprecated_member_use: ignore
+    lines_longer_than_80_chars: ignore
+    cascade_invocations: ignore
+    use_string_buffers: ignore
+    parameter_assignments: ignore
+    comment_references: ignore
+    use_full_hex_values_for_flutter_colors: ignore
+    prefer_asserts_with_message: ignore
+    use_named_constants: ignore
+    no_default_cases: ignore
+    require_trailing_commas: ignore
+
+linter:
+  rules:
+    public_member_api_docs: false
+    library_private_types_in_public_api: false
+    avoid_setters_without_getters: false
+    avoid_positional_boolean_parameters: false
