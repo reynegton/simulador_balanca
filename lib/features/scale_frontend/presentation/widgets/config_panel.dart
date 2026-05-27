@@ -119,22 +119,16 @@ class _ConfigPanelState extends State<ConfigPanel> {
       builder: (context, backendState) {
         final isRunning = backendState is ScaleBackendRunning;
 
-        final connectionCard = Card(
-          color: Theme.of(context).cardColor,
-          elevation: 0,
-          margin: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.08),
-            ),
-          ),
+        final connectionCard = AdwCard(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
                 if (backendState is ScaleBackendRunning) ...[
-                  const Icon(Icons.check_circle, color: Colors.green),
+                  Icon(
+                    Icons.check_circle,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -167,23 +161,15 @@ class _ConfigPanelState extends State<ConfigPanel> {
                   const SizedBox(width: 16),
                   SizedBox(
                     width: 160,
-                    child: Builder(
-                      builder: (context) {
-                        const btnColor = Colors.redAccent;
-                        final textColor = btnColor.computeLuminance() > 0.5
-                            ? Colors.black
-                            : Colors.white;
-                        return ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: btnColor,
-                            foregroundColor: textColor,
-                          ),
-                          onPressed: () => context
-                              .read<ScaleBackendBloc>()
-                              .add(StopServerEvent()),
-                          child: const Text("Parar Servidor"),
-                        );
-                      },
+                    child: AdwButton(
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                      textStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.onError),
+                      opaque: true,
+                      onPressed: () => context
+                          .read<ScaleBackendBloc>()
+                          .add(StopServerEvent()),
+                      child: const Text("Parar Servidor"),
                     ),
                   ),
                 ] else if (backendState is ScaleBackendLoading) ...[
@@ -203,7 +189,10 @@ class _ConfigPanelState extends State<ConfigPanel> {
                     ),
                   ),
                 ] else ...[
-                  const Icon(Icons.cancel, color: Colors.red),
+                  Icon(
+                    Icons.cancel,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -236,26 +225,17 @@ class _ConfigPanelState extends State<ConfigPanel> {
                   const SizedBox(width: 16),
                   SizedBox(
                     width: 160,
-                    child: Builder(
-                      builder: (context) {
-                        const btnColor = Colors.green;
-                        final textColor = btnColor.computeLuminance() > 0.5
-                            ? Colors.black
-                            : Colors.white;
-                        return ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: btnColor,
-                            foregroundColor: textColor,
-                          ),
-                          onPressed: () {
-                            final port = int.tryParse(_portCtrl.text) ?? 32211;
-                            context
-                                .read<ScaleBackendBloc>()
-                                .add(StartServerEvent(port));
-                          },
-                          child: const Text("Iniciar Servidor"),
-                        );
+                    child: AdwButton(
+                      backgroundColor: AdwaitaColors.green5,
+                      textStyle: const TextStyle(color: Colors.white),
+                      opaque: true,
+                      onPressed: () {
+                        final port = int.tryParse(_portCtrl.text) ?? 32211;
+                        context
+                            .read<ScaleBackendBloc>()
+                            .add(StartServerEvent(port));
                       },
+                      child: const Text("Iniciar Servidor"),
                     ),
                   ),
                 ],
@@ -297,7 +277,7 @@ class _ConfigPanelState extends State<ConfigPanel> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Expanded(
-                              child: TextField(
+                              child: AdwTextField(
                                 controller: _portCtrl,
                                 enabled: !isRunning,
                                 decoration:
@@ -310,7 +290,7 @@ class _ConfigPanelState extends State<ConfigPanel> {
                             ),
                             const SizedBox(width: 16),
                             Expanded(
-                              child: TextField(
+                              child: AdwTextField(
                                 controller: _casasCtrl,
                                 enabled: !isRunning,
                                 decoration:
@@ -324,7 +304,7 @@ class _ConfigPanelState extends State<ConfigPanel> {
                             const SizedBox(width: 16),
                             SizedBox(
                               width: 160,
-                              child: ElevatedButton(
+                              child: AdwButton(
                                 onPressed: isRunning ? null : _saveProtocol,
                                 child: const Text("Aplicar Protocolo"),
                               ),
@@ -344,7 +324,7 @@ class _ConfigPanelState extends State<ConfigPanel> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Expanded(
-                              child: TextField(
+                              child: AdwTextField(
                                 controller: _minMaxCtrl,
                                 enabled: !isRunning,
                                 decoration:
@@ -365,7 +345,7 @@ class _ConfigPanelState extends State<ConfigPanel> {
                             const SizedBox(width: 16),
                             SizedBox(
                               width: 160,
-                              child: ElevatedButton(
+                              child: AdwButton(
                                 onPressed: isRunning ? null : _saveLimits,
                                 child: const Text("Aplicar Limites"),
                               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:libadwaita/libadwaita.dart';
 
 Future showDialogCustom({
   required BuildContext context,
@@ -15,58 +16,52 @@ Future showDialogCustom({
   await showDialog(
     context: context,
     builder: (context) {
+      final theme = Theme.of(context);
+      final contentStyle = theme.textTheme.bodyMedium?.copyWith(
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+      );
+      final contentWidget = Text(
+        msg,
+        textAlign: TextAlign.center,
+        maxLines: maxLine,
+        overflow: TextOverflow.ellipsis,
+        style: contentStyle,
+      );
       return AlertDialog(
         title: Text(
           title,
-          style: const TextStyle(fontSize: 14),
+          style: theme.textTheme.titleMedium,
           textAlign: TextAlign.center,
         ),
         content: height == double.minPositive
-            ? Text(
-                msg,
-                textAlign: TextAlign.center,
-                maxLines: maxLine,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Colors.black54,
-                ),
-              )
-            : Container(
+            ? contentWidget
+            : SizedBox(
                 height: height,
-                alignment: Alignment.center,
-                child: Text(
-                  msg,
-                  textAlign: TextAlign.center,
-                  maxLines: maxLine,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.black54,
-                  ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: contentWidget,
                 ),
               ),
         actionsAlignment: MainAxisAlignment.center,
         actions: <Widget>[
-          exibirCancelar
-              ? ElevatedButton(
-                  onPressed: onPressedButtonCancelar ??
-                      () {
-                        Navigator.of(context).pop();
-                      },
-                  child: Text(
-                    nomeButtonCancelar,
-                  ),
-                )
-              : const SizedBox.shrink(),
-          ElevatedButton(
+          if (exibirCancelar)
+            AdwButton(
+              onPressed: onPressedButtonCancelar ??
+                  () {
+                    Navigator.of(context).pop();
+                  },
+              child: Text(nomeButtonCancelar),
+            ),
+          AdwButton(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            textStyle:
+                TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+            opaque: true,
             onPressed: onPressed ??
                 () {
                   Navigator.of(context).pop();
                 },
-            child: Text(
-              nomeButton,
-            ),
+            child: Text(nomeButton),
           ),
         ],
       );

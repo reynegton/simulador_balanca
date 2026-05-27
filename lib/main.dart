@@ -68,10 +68,14 @@ class MyApp extends StatelessWidget {
         child: Consumer<ThemeNotifier>(
           builder: (context, theme, child) => DynamicColorBuilder(
             builder: (lightDynamic, darkDynamic) {
+              // Adwaita uses the same accent color in both light and dark —
+              // darkDynamic?.primary is a Material You tonal shift (pastel),
+              // so we use lightDynamic?.primary for both.
+              final accentColor = lightDynamic?.primary ?? darkDynamic?.primary;
               ThemeData lightTheme =
-                  AdwaitaThemeData.light(accentColor: lightDynamic?.primary);
+                  AdwaitaThemeData.light(accentColor: accentColor);
               ThemeData darkTheme =
-                  AdwaitaThemeData.dark(accentColor: darkDynamic?.primary);
+                  AdwaitaThemeData.dark(accentColor: accentColor);
 
               return MaterialApp(
                 debugShowCheckedModeBanner: kDebugMode,

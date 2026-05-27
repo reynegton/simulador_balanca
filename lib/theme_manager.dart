@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:libadwaita/libadwaita.dart';
 
 import 'Utils/shared_preferences_helper.dart';
 
 class ThemeNotifier extends ChangeNotifier {
-  final lightTheme = ThemeData(
-    primarySwatch: Colors.blue,
-  );
-  final darkTheme = ThemeData(
-    primarySwatch: Colors.blueGrey,
-    brightness: Brightness.dark,
-  );
+  final lightTheme = AdwaitaThemeData.light();
+  final darkTheme = AdwaitaThemeData.dark();
 
   late ThemeData _themeData;
   ThemeData getTheme() => _themeData;
@@ -19,12 +15,10 @@ class ThemeNotifier extends ChangeNotifier {
     SharedPreferencesHelper.instance
         .loadString(EnumKeysSharedPreferences.eThemeMode)
         .then((value) {
-      // print('value read from storage: $value');
       var themeMode = value;
       if (themeMode == 'light') {
         _themeData = lightTheme;
       } else {
-        // print('setting dark theme');
         _themeData = darkTheme;
       }
       notifyListeners();

@@ -75,22 +75,7 @@ class TextFormFieldWidget extends StatelessWidget {
       enableInteractiveSelection: enableInteractiveSelection,
       keyboardType: textInputType ?? TextInputType.text,
       decoration: InputDecoration(
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.black,
-          ),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.blue.withValues(alpha: 0.6),
-          ),
-        ),
         labelText: title,
-        labelStyle: TextStyle(
-          fontSize: 13,
-          //color: Colors.blueGrey.shade800,
-          fontWeight: FontWeight.bold,
-        ),
       ),
       validator: funcValidator,
       textInputAction: textInputAction ?? TextInputAction.done,
@@ -105,10 +90,6 @@ class TextFormFieldWidget extends StatelessWidget {
           },
       onChanged: onChanged ?? (value) {},
       onTap: onTap ?? () {},
-      style: TextStyle(
-        color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.black,
-        fontSize: 12.5,
-      ),
     );
   }
 }

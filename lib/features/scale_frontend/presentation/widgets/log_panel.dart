@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:libadwaita/libadwaita.dart';
 import '../../../scale_backend/presentation/bloc/scale_backend_bloc.dart';
 import '../../../scale_backend/presentation/bloc/scale_backend_state.dart';
 
@@ -8,17 +9,7 @@ class LogPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      color: theme.cardColor,
-      elevation: 0,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.dividerColor.withValues(alpha: 0.08),
-        ),
-      ),
+    return AdwCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

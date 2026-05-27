@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:libadwaita/libadwaita.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
@@ -24,60 +25,52 @@ class MyDrawerMenu extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DrawerHeader(
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Simulador Balança"),
-                      Text(snapPackageInfo.data?.version ?? ""),
-                      Expanded(child: Container()),
-                      const Text('Criado por Reynegton Nunes'),
+                      Text(
+                        "Simulador Balança",
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        snapPackageInfo.data?.version ?? "",
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Criado por Reynegton Nunes',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.5),
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.5),
+                      ),
                     ],
                   ),
                 ),
-                ListTile(
-                  title: Consumer<ThemeNotifier>(
-                    builder: (context, theme, child) => InkWell(
-                      onTap: () => !theme.boDarkMode
-                          ? theme.setDarkMode()
-                          : theme.setLightMode(),
-                      child: Card(
-                        color: Theme.of(context).cardColor,
-                        elevation: 0,
-                        margin: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withValues(alpha: 0.08),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Modo Escuro",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                              Icon(
-                                theme.boDarkMode
-                                    ? Icons.dark_mode
-                                    : Icons.light_mode,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                Consumer<ThemeNotifier>(
+                  builder: (context, theme, child) => AdwSwitchRow(
+                    title: 'Modo Escuro',
+                    value: theme.boDarkMode,
+                    onChanged: (_) => theme.boDarkMode
+                        ? theme.setLightMode()
+                        : theme.setDarkMode(),
                   ),
                 ),
               ],

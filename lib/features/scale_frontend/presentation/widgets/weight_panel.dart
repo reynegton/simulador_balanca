@@ -72,17 +72,7 @@ class _WeightPanelState extends State<WeightPanel> {
   Widget build(BuildContext context) {
     return BlocBuilder<WeightBloc, WeightState>(
       builder: (context, state) {
-        final theme = Theme.of(context);
-        return Card(
-          color: theme.cardColor,
-          elevation: 0,
-          margin: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-              color: theme.dividerColor.withValues(alpha: 0.08),
-            ),
-          ),
+        return AdwCard(
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -94,7 +84,7 @@ class _WeightPanelState extends State<WeightPanel> {
                 Row(
                   children: [
                     Expanded(
-                      child: TextField(
+                      child: AdwTextField(
                         controller: _pesoCtrl,
                         decoration:
                             const InputDecoration(labelText: 'Peso Base'),
@@ -115,7 +105,7 @@ class _WeightPanelState extends State<WeightPanel> {
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: TextField(
+                      child: AdwTextField(
                         controller: _taraCtrl,
                         decoration: const InputDecoration(labelText: 'Tara'),
                         keyboardType: TextInputType.number,
@@ -172,7 +162,7 @@ class _WeightPanelState extends State<WeightPanel> {
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: TextField(
+                      child: AdwTextField(
                         controller: _oscilacaoCtrl,
                         decoration: const InputDecoration(
                             labelText: 'Variância de Oscilação (+/-)'),
@@ -196,12 +186,9 @@ class _WeightPanelState extends State<WeightPanel> {
                     ),
                     const SizedBox(width: 16),
                     Builder(builder: (context) {
-                      final displayColor =
-                          Theme.of(context).colorScheme.primary;
-                      final displayTextColor =
-                          displayColor.computeLuminance() > 0.5
-                              ? Colors.black
-                              : Colors.white;
+                      final colorScheme = Theme.of(context).colorScheme;
+                      final displayColor = colorScheme.primary;
+                      final displayTextColor = colorScheme.onPrimary;
 
                       return Container(
                         padding: const EdgeInsets.symmetric(
