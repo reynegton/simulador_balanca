@@ -2,6 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:dynamic_color/dynamic_color.dart';
+
+import 'core/theme/adwaita_theme.dart';
 
 import 'splash_page.dart';
 import 'theme_manager.dart';
@@ -22,6 +26,14 @@ void main() {
       child: const MyApp(),
     ),
   );
+
+  doWhenWindowReady(() {
+    const initialSize = Size(1000, 700);
+    appWindow.minSize = const Size(400, 600);
+    appWindow.size = initialSize;
+    appWindow.alignment = Alignment.center;
+    appWindow.show();
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -52,11 +64,20 @@ class MyApp extends StatelessWidget {
           ),
         ],
         child: Consumer<ThemeNotifier>(
-          builder: (context, theme, child) => MaterialApp(
-            debugShowCheckedModeBanner: kDebugMode,
-            title: 'Simulador Balança IP',
-            theme: theme.getTheme(),
-            home: const SplashPage(),
+          builder: (context, theme, child) => DynamicColorBuilder(
+            builder: (lightDynamic, darkDynamic) {
+              ThemeData lightTheme = AdwaitaTheme.getLight(primaryColor: lightDynamic?.primary);
+              ThemeData darkTheme = AdwaitaTheme.getDark(primaryColor: darkDynamic?.primary);
+
+              return MaterialApp(
+                debugShowCheckedModeBanner: kDebugMode,
+                title: 'Simulador Balança IP',
+                theme: lightTheme,
+                darkTheme: darkTheme,
+                themeMode: theme.boDarkMode ? ThemeMode.dark : ThemeMode.light,
+                home: const SplashPage(),
+              );
+            },
           ),
         ),
       ),

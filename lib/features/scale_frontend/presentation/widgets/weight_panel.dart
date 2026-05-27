@@ -24,8 +24,9 @@ class _WeightPanelState extends State<WeightPanel> {
   @override
   void initState() {
     super.initState();
-    _pesoCtrl = TextEditingController();
-    _taraCtrl = TextEditingController();
+    final bloc = context.read<WeightBloc>();
+    _pesoCtrl = TextEditingController(text: _formatValue(bloc.state.peso));
+    _taraCtrl = TextEditingController(text: _formatValue(bloc.state.tara));
     _oscilacaoCtrl = TextEditingController(text: "0");
   }
 
@@ -54,27 +55,24 @@ class _WeightPanelState extends State<WeightPanel> {
 
   int _parseValue(String text) {
     if (text.isEmpty) return 0;
-    final clean = text.replaceAll('.', '').replaceAll(',', '');
-    return int.tryParse(clean) ?? 0;
+    final cleanText = text.replaceAll(',', '.');
+    final doubleValue = double.tryParse(cleanText) ?? 0.0;
+    return (doubleValue * (widget.config.casasDecimais > 0 ? pow(10, widget.config.casasDecimais) : 1)).round();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<WeightBloc, WeightState>(
-      listenWhen: (previous, current) => previous.peso != current.peso && current.isOscillating,
-      listener: (context, state) {
-        // Sync text controller when oscillating
-        _pesoCtrl.text = _formatValue(state.peso);
-      },
+    return BlocBuilder<WeightBloc, WeightState>(
       builder: (context, state) {
         return Card(
           elevation: 4,
+          margin: EdgeInsets.zero,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Simulação de Peso", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text("Simulação de Peso", style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -144,14 +142,58 @@ class _WeightPanelState extends State<WeightPanel> {
                     Expanded(
                       child: TextField(
                         controller: _oscilacaoCtrl,
-                        enabled: !state.isOscillating,
                         decoration: const InputDecoration(labelText: 'Variância de Oscilação (+/-)'),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           CurrencyInputFormatterFreeEdit(acceptNegative: false, decimalPrecision: widget.config.casasDecimais),
                           MaxValueImputFormatter(widget.config.minMaxValue, widget.config.casasDecimais),
                         ],
+                        onChanged: (val) {
+                          if (state.isOscillating) {
+                            final variance = _parseValue(val);
+                            context.read<WeightBloc>().add(ToggleOscillationEvent(true, variance, widget.config.minMaxValue));
+                          }
+                        },
                       ),
+                    ),
+                    const SizedBox(width: 16),
+                    Builder(
+                      builder: (context) {
+                        final displayColor = Theme.of(context).colorScheme.primary;
+                        final displayTextColor = displayColor.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+                        
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: displayColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.monitor_weight, color: displayTextColor),
+                              const SizedBox(width: 8),
+                          Stack(
+                            alignment: Alignment.centerRight,
+                            children: [
+                              Text(
+                                _formatValue(widget.config.minMaxValue),
+                                style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                                  Text(
+                                    _formatValue(state.peso),
+                                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                      color: displayTextColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     ),
                   ],
                 )

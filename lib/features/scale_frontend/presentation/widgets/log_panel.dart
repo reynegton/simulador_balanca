@@ -10,14 +10,16 @@ class LogPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      margin: const EdgeInsets.only(top: 16, bottom: 16, right: 16),
+      margin: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            color: Theme.of(context).primaryColorDark,
-            child: const Text("Log de Transmissão TCP", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text(
+              "Log de Transmissão TCP",
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
           ),
           Expanded(
             child: BlocBuilder<ScaleBackendBloc, ScaleBackendState>(
@@ -28,12 +30,14 @@ class LogPanel extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return ListTile(
                         dense: true,
-                        title: Text(state.history[index], style: const TextStyle(fontFamily: 'monospace')),
+                        title: Text(state.history[index],
+                            style: Theme.of(context).textTheme.bodySmall),
                       );
                     },
                   );
                 } else if (state is ScaleBackendError) {
-                  return Center(child: Text("Erro no servidor: ${state.message}"));
+                  return Center(
+                      child: Text("Erro no servidor: ${state.message}"));
                 }
                 return const Center(child: Text("Servidor Offline"));
               },
