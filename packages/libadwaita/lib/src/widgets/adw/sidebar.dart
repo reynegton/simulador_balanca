@@ -186,9 +186,7 @@ class _AdwSidebarItemBuilder extends StatelessWidget {
               Text(
                 currentItem.label!,
                 style: currentItem.labelStyle ??
-                    const TextStyle(
-                      fontSize: 15,
-                    ),
+                    Theme.of(context).textTheme.bodyMedium,
               ),
         ],
       ),

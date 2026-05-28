@@ -82,6 +82,10 @@ class AdwaitaThemeData {
         fontSize: 15,
         color: color,
       ),
+      bodyMedium: TextStyle(
+        fontSize: 14.6,
+        color: color,
+      ),
       bodySmall: TextStyle(
         fontSize: 13,
         color: color,

@@ -33,8 +33,7 @@ class AdwDefaultColors {
 extension BorderContext on BuildContext {
   bool get _isDark => Theme.of(this).brightness == Brightness.dark;
 
-  Color get borderColor =>
-      _isDark ? AdwDefaultColors.borderDark : AdwDefaultColors.borderLight;
+  Color get borderColor => Theme.of(this).dividerColor;
   Color get checkboxColor =>
       _isDark ? const Color(0xFF535353) : const Color(0xFFE0E0E0);
 
@@ -49,5 +48,5 @@ extension BorderContext on BuildContext {
   Color get hoverColor => _isDark
       ? Theme.of(this).colorScheme.surface.lighten(0.15)
       : Theme.of(this).colorScheme.surface.darken(0.005);
-  Color get textColor => _isDark ? Colors.white : Colors.black;
+  Color get textColor => Theme.of(this).colorScheme.onSurface;
 }

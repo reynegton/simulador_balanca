@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:libadwaita/src/utils/colors.dart';
-import 'package:libadwaita/src/widgets/adw/new/macos_caption_button.dart';
-import 'package:libadwaita/src/widgets/adw/new/windows_caption_button.dart';
+import 'package:libadwaita/src/widgets/adw/macos_caption_button.dart';
+import 'package:libadwaita/src/widgets/adw/windows_caption_button.dart';
 import 'package:libadwaita/src/widgets/widgets.dart';
 import 'package:universal_io/io.dart';
 

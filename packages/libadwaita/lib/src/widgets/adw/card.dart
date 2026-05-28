@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:libadwaita/src/theme/adw_constants.dart';
 
 /// A non-expandable card that matches the Adwaita card style.
 /// Use this for static content panels; use [AdwExpanderCard] for collapsible ones.
@@ -20,7 +21,7 @@ class AdwCard extends StatelessWidget {
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AdwConstants.cardRadius),
         side: BorderSide(
           color: theme.dividerColor.withOpacity(0.08),
         ),

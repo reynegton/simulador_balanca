@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:libadwaita/src/theme/adw_constants.dart';
 
 class AdwExpanderCard extends StatefulWidget {
   const AdwExpanderCard({
@@ -53,13 +54,13 @@ class _AdwExpanderCardState extends State<AdwExpanderCard> with SingleTickerProv
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 250),
+      duration: AdwConstants.expandDuration,
       vsync: this,
     );
     _iconTurns = Tween<double>(begin: 0, end: 0.5).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeIn,
+        curve: AdwConstants.expandCurve,
       ),
     );
     _heightFactor = _controller.drive(
@@ -120,7 +121,7 @@ class _AdwExpanderCardState extends State<AdwExpanderCard> with SingleTickerProv
       color: cardBgColor,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AdwConstants.cardRadius),
         side: BorderSide(
           color: theme.dividerColor.withOpacity(0.08),
         ),
@@ -134,12 +135,12 @@ class _AdwExpanderCardState extends State<AdwExpanderCard> with SingleTickerProv
           InkWell(
             onTap: _toggleExpansion,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: AdwConstants.spaceLarge, vertical: AdwConstants.spaceMedium),
               child: Row(
                 children: [
                   if (widget.leading != null) ...[
                     widget.leading!,
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AdwConstants.spaceMedium),
                   ],
                   Expanded(
                     child: Column(
@@ -200,7 +201,7 @@ class _AdwExpanderCardState extends State<AdwExpanderCard> with SingleTickerProv
                   color: theme.dividerColor.withOpacity(0.08),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AdwConstants.spaceLarge),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: widget.children,

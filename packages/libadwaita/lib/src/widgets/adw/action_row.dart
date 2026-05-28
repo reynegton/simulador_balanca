@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:libadwaita/src/theme/adw_constants.dart';
 
 class AdwActionRow extends StatelessWidget {
   const AdwActionRow({
@@ -49,7 +50,7 @@ class AdwActionRow extends StatelessWidget {
       enabled: enabled,
       horizontalTitleGap: horizontalTitleGap,
       contentPadding: contentPadding ??
-          const EdgeInsets.symmetric(horizontal: 12),
+          const EdgeInsets.symmetric(horizontal: AdwConstants.spaceMedium),
       leading: start != null
           ? SizedBox(height: double.infinity, child: start)
           : null,

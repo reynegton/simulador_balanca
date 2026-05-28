@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:libadwaita/src/theme/adw_constants.dart';
 import 'package:libadwaita/src/utils/colors.dart';
 
 /// Set of status that a [AdwButton] widget can be at any given time.
@@ -39,13 +40,13 @@ class AdwButton extends StatefulWidget {
     this.backgroundColorBuilder = defaultBackgroundColorBuilder,
     this.constraints = defaultButtonConstrains,
     this.borderRadius = const BorderRadius.all(
-      Radius.circular(6),
+      Radius.circular(AdwConstants.buttonRadius),
     ),
     this.border,
     this.shape = BoxShape.rectangle,
     this.boxShadow,
-    this.animationDuration = const Duration(milliseconds: 200),
-    this.animationCurve = Curves.easeOutQuad,
+    this.animationDuration = AdwConstants.defaultDuration,
+    this.animationCurve = AdwConstants.defaultCurve,
     this.isActive = false,
   }) : assert(
           builder != null || child != null,
@@ -66,8 +67,8 @@ class AdwButton extends StatefulWidget {
     this.backgroundColorBuilder = defaultBackgroundColorBuilder,
     this.border,
     this.boxShadow,
-    this.animationDuration = const Duration(milliseconds: 200),
-    this.animationCurve = Curves.easeOutQuad,
+    this.animationDuration = AdwConstants.defaultDuration,
+    this.animationCurve = AdwConstants.defaultCurve,
     this.isActive = false,
   })  : assert(builder != null || child != null, _bothBuilderAndChildError),
         constraints = BoxConstraints.tightFor(width: size, height: size),
@@ -88,8 +89,8 @@ class AdwButton extends StatefulWidget {
     this.constraints = defaultButtonConstrains,
     this.border,
     this.boxShadow,
-    this.animationDuration = const Duration(milliseconds: 200),
-    this.animationCurve = Curves.easeOutQuad,
+    this.animationDuration = AdwConstants.defaultDuration,
+    this.animationCurve = AdwConstants.defaultCurve,
     this.isActive = false,
   })  : borderRadius = const BorderRadius.all(
           Radius.circular(9999),
@@ -109,13 +110,13 @@ class AdwButton extends StatefulWidget {
     this.backgroundColorBuilder = flatBackgroundColorBuilder,
     this.constraints = defaultButtonConstrains,
     this.borderRadius = const BorderRadius.all(
-      Radius.circular(6),
+      Radius.circular(AdwConstants.buttonRadius),
     ),
     this.border,
     this.shape = BoxShape.rectangle,
     this.boxShadow,
-    this.animationDuration = const Duration(milliseconds: 200),
-    this.animationCurve = Curves.easeOutQuad,
+    this.animationDuration = AdwConstants.defaultDuration,
+    this.animationCurve = AdwConstants.defaultCurve,
     this.isActive = false,
   })  : opaque = false,
         assert(builder != null || child != null, _bothBuilderAndChildError);
@@ -239,7 +240,7 @@ class AdwButton extends StatefulWidget {
     AdwButtonStatus status, {
     bool opaque = false,
   }) {
-    return (backgroundColor ?? (context.isDark ? Colors.black : Colors.white))
+    return (backgroundColor ?? Theme.of(context).colorScheme.surface)
         .resolveFlatAdwButtonColor(
       context,
       status,
@@ -318,10 +319,8 @@ class _AdwButtonState extends State<AdwButton> {
               ),
             ),
             child: DefaultTextStyle.merge(
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 14.6,
-              ).merge(widget.textStyle),
+              style: Theme.of(context).textTheme.bodyMedium?.merge(widget.textStyle) ??
+                  const TextStyle(fontWeight: FontWeight.w500).merge(widget.textStyle),
               child: widget.child ??
                   widget.builder!(
                     context,
