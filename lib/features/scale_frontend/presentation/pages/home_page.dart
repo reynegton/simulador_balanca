@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/config_bloc/config_bloc.dart';
@@ -25,10 +26,39 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final FlapController _flapController = FlapController()..isOpen = false;
 
+  bool _showMinimize = true;
+  bool _showMaximize = true;
+
   @override
   void initState() {
     super.initState();
     context.read<ConfigBloc>().add(LoadConfigEvent());
+    _detectLinuxButtonLayout();
+  }
+
+  void _detectLinuxButtonLayout() {
+    try {
+      if (Platform.isLinux) {
+        final result = Process.runSync('gsettings', [
+          'get',
+          'org.gnome.desktop.wm.preferences',
+          'button-layout'
+        ]);
+        if (result.exitCode == 0) {
+          final layout = result.stdout.toString().toLowerCase();
+          setState(() {
+            _showMinimize = layout.contains('minimize');
+            _showMaximize = layout.contains('maximize');
+          });
+        }
+      }
+    } catch (e) {
+      // Fallback em caso de erro ou outra plataforma
+      setState(() {
+        _showMinimize = true;
+        _showMaximize = true;
+      });
+    }
   }
 
   @override
@@ -45,8 +75,8 @@ class _HomePageState extends State<HomePage> {
       ),
       actions: AdwActions(
         onClose: () => appWindow.close(),
-        onMaximize: () => appWindow.maximizeOrRestore(),
-        onMinimize: () => appWindow.minimize(),
+        onMaximize: _showMaximize ? () => appWindow.maximizeOrRestore() : null,
+        onMinimize: _showMinimize ? () => appWindow.minimize() : null,
         onHeaderDrag: () => appWindow.startDragging(),
         onDoubleTap: () => appWindow.maximizeOrRestore(),
       ),
