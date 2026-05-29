@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:libadwaita/libadwaita.dart';
+import 'package:adwaita_flutter/adwaita_flutter.dart';
 import '../../domain/entities/scale_config.dart';
 import '../bloc/weight_bloc/weight_bloc.dart';
 import '../bloc/weight_bloc/weight_event.dart';

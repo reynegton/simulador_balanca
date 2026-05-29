@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 
-import 'package:libadwaita/libadwaita.dart';
+import 'package:adwaita_flutter/adwaita_flutter.dart';
 
 import 'splash_page.dart';
 import 'theme_manager.dart';

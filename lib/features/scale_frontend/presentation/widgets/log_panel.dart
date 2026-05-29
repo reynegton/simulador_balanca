@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:libadwaita/libadwaita.dart';
+import 'package:adwaita_flutter/adwaita_flutter.dart';
 import '../../../scale_backend/presentation/bloc/scale_backend_bloc.dart';
 import '../../../scale_backend/presentation/bloc/scale_backend_state.dart';
 

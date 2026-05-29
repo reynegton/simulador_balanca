@@ -38,8 +38,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
-  libadwaita:
-    path: packages/libadwaita
+  adwaita_flutter:
+    path: packages/adwaita_flutter
   package_info_plus:
   provider:
   shared_preferences:

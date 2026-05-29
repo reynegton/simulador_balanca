@@ -10,7 +10,7 @@ import '../../../scale_backend/presentation/bloc/scale_backend_state.dart';
 import '../../domain/entities/scale_config.dart';
 import '../bloc/config_bloc/config_bloc.dart';
 import '../bloc/config_bloc/config_event.dart';
-import 'package:libadwaita/libadwaita.dart';
+import 'package:adwaita_flutter/adwaita_flutter.dart';
 
 class ConfigPanel extends StatefulWidget {
   final ScaleConfig config;

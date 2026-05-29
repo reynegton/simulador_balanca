@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:libadwaita/libadwaita.dart';
+import 'package:adwaita_flutter/adwaita_flutter.dart';
 
 Future showDialogCustom({
   required BuildContext context,

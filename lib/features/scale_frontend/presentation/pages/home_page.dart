@@ -13,7 +13,7 @@ import '../../../../widgets/my_drawer_menu.dart';
 import '../widgets/config_panel.dart';
 import '../widgets/weight_panel.dart';
 import '../widgets/log_panel.dart';
-import 'package:libadwaita/libadwaita.dart';
+import 'package:adwaita_flutter/adwaita_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

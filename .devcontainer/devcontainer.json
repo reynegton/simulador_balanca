@@ -1,0 +1,19 @@
+{                                                                  
+      "name": "Flutter Dev Container",                                 
+      "image": "localhost/flutter-dev-env:latest",                     
+      
+      "customizations": {
+        "vscode": {
+          "extensions": [
+            "dart-code.dart-code",
+            "dart-code.flutter"
+          ]
+        }
+      },
+      
+      // Muito importante no Podman: evita problemas de permissão para 
+      //ler/gravar seus arquivos locais
+      "runArgs": [
+        "--userns=keep-id"
+      ]
+    }
